@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Publications List</title>
+</head>
+<body>
+  <h1>Publications List</h1>
+  
+  <a href="/publications/new">+ Add New Publication</a> | 
+  <a href="/requests">Back to Dashboard</a>
+
+  <% if (publications.length === 0) { %>
+    <p>No publications found in the system.</p>
+  <% } else { %>
+    <ul>
+      <% publications.forEach(pub => { %>
+        <li>
+          <strong>Title:</strong> <%= pub.title %> <br>
+          <strong>Grade:</strong> <%= pub.grade %> <br>
+          <strong>Subject:</strong> <%= pub.subject %> <br>
+          <strong>Owner:</strong> <%= pub.owner ? pub.owner : 'N/A' %>
+        </li>
+        <hr>
+      <% }) %>
+    </ul>
+  <% } %>
+</body>
+</html>

@@ -10,16 +10,7 @@ const methodOverride = require('method-override');
 const morgan = require('morgan');
 const session = require('express-session');
 
-const authController = require('./controllers/auth.js');
-
-const port = process.env.PORT ? process.env.PORT : '3000';
-
-mongoose.connect(process.env.MONGODB_URI);
-
-mongoose.connection.on('connected', () => {
-  console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
-});
-
+// 1. PRVO OSNOVNI MIDDLEWARE (ovo je moralo na vrh da bi Express čitao podatke iz forme!)
 app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 // app.use(morgan('dev'));
@@ -31,15 +22,31 @@ app.use(
   })
 );
 
+// 2. KONEKCIJA SA BAZOM
+mongoose.connect(process.env.MONGODB_URI);
+
+mongoose.connection.on('connected', () => {
+  console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
+});
+
+// 3. KONTROLERI I RUTE (sada dolaze nakon middleware-a)
+const authController = require('./controllers/auth.js');
+app.use('/auth', authController);
+
+const requestsController = require('./controllers/requests.js');
+app.use('/requests', requestsController);
+
+const publicationsController = require('./controllers/publications.js');
+app.use('/publications', publicationsController);
+
+// Početna ruta
 app.get('/', (req, res) => {
   res.render('index.ejs', {
     user: req.session.user,
   });
 });
 
-//obrisao ono sto je bilo ovdje
-
-app.use('/auth', authController);
+const port = process.env.PORT ? process.env.PORT : '3000';
 
 app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);

@@ -47,9 +47,9 @@ router.post('/sign-up', async (req, res) => {
 
 router.post('/sign-in', async (req, res) => {
   try {
-    console.log("Pokušaj prijave za username:", req.body.username);
+    console.log("Pokušaj prijave za username:", req.body.email);
     // First, get the user from the database
-    const userInDatabase = await User.findOne({ username: req.body.username });
+    const userInDatabase = await User.findOne({ email: req.body.email });
     if (!userInDatabase) {
       return res.send('Login failed. Please try again.');
     }
@@ -67,7 +67,7 @@ router.post('/sign-in', async (req, res) => {
     // Avoid storing the password, even in hashed format, in the session
     // If there is other data you want to save to `req.session.user`, do so here!
     req.session.user = {
-      username: userInDatabase.username,
+      email: userInDatabase.email,
       _id: userInDatabase._id
     };
   

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create New Request</title>
+</head>
+<body>
+  <h1>Create a New Processing Request</h1>
+  
+  <form action="/requests" method="POST">
+    
+    <!-- Izbor publikacije iz baze -->
+    <label for="publication">Publication:</label>
+    <select name="publication" id="publication" required>
+      <% publications.forEach(pub => { %>
+        <option value="<%= pub._id %>"><%= pub.title %> (Grade: <%= pub.grade %>, Subject: <%= pub.subject %>)</option>
+      <% }) %>
+    </select>
+    <br><br>
+
+    <!-- Opis zahteva / zadatka -->
+    <label for="req_description">Task Description:</label>
+    <textarea name="req_description" id="req_description" rows="4" cols="50" required placeholder="Describe the multimedia assets to be prepared..."></textarea>
+    <br><br>
+
+    <!-- Lokacija fajla (link ili putanja) -->
+    <label for="file_location">File Location (Link / Path):</label>
+    <input type="text" name="file_location" id="file_location" required placeholder="Paste link or path here...">
+    <br><br>
+
+    <!-- Izbor procesora kome se zadatak dodeljuje -->
+    <label for="assignedTo">Assign To Processor:</label>
+    <select name="assignedTo" id="assignedTo" required>
+      <% processors.forEach(proc => { %>
+        <option value="<%= proc._id %>"><%= proc.username %> (<%= proc.email %>)</option>
+      <% }) %>
+    </select>
+    <br><br>
+
+    <button type="submit">Create Request</button>
+  </form>
+
+  <br>
+  <a href="/requests">Back to Dashboard</a>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Requests</title>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <p>Logged in as: <strong><%= currentUser.username %></strong> (<%= currentUser.role %>)</p>
+  
+  <a href="/">Home</a> | <a href="/auth/sign-out">Sign Out</a>
+
+  <% if (currentUser.role === 'editor') { %>
+    <hr>
+    <a href="/requests/new">+ Create New Request</a>
+  <% } %>
+
+  <h2>Tasks List</h2>
+
+  <% if (tasks.length === 0) { %>
+    <p>There are currently no tasks in the system.</p>
+  <% } else { %>
+    <ul>
+      <% tasks.forEach(task => { %>
+        <li>
+          <strong>Publication:</strong> <%= task.publication ? task.publication.title : 'Unknown' %> <br>
+          <strong>Description:</strong> <%= task.req_description %> <br>
+          <strong>File Location:</strong> <a href="<%= task.file_location %>" target="_blank">Open File</a> <br>
+          <strong>Status:</strong> <%= task.status %> <br>
+          <strong>Assigned To:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Unassigned' %> <br>
+
+          <!-- Ako je ulogovani korisnik processor, prikazujemo formu za ažuriranje statusa -->
+          <% if (currentUser.role === 'processor') { %>
+            <form action="/requests/<%= task._id %>?_method=PUT" method="POST" style="margin-top: 10px;">
+              <select name="status">
+                <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                <option value="In Progress" <%= task.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+              </select>
+              <button type="submit">Update Status</button>
+            </form>
+          <% } %>
+        </li>
+        <hr>
+      <% }) %>
+    </ul>
+  <% } %>
+</body>
+</html>

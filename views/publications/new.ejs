@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add New Publication</title>
+</head>
+<body>
+  <h1>Add a New Publication</h1>
+  
+  <form action="/publications" method="POST">
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title" required placeholder="e.g., Matematika 5">
+    <br><br>
+
+    <label for="grade">Grade:</label>
+    <input type="number" name="grade" id="grade" required placeholder="e.g., 5">
+    <br><br>
+
+    <label for="subject">Subject:</label>
+    <input type="text" name="subject" id="subject" required placeholder="e.g., Mathematics">
+    <br><br>
+
+    <label for="owner">Owner / Author:</label>
+    <input type="text" name="owner" id="owner" placeholder="e.g., ZUNS">
+    <br><br>
+
+    <button type="submit">Save Publication</button>
+  </form>
+
+  <br>
+  <a href="/requests">Back to Dashboard</a>
+</body>
+</html>

@@ -2,30 +2,40 @@ const express = require('express');
 const router = express.Router();
 
 const Publication = require('../models/publication.js');
-const User = require('../models/user.js'); // Obavezno uključujemo i User model zbog provere uloge
+const User = require('../models/user.js');
 
-// Middleware funkcija za proveru da li je korisnik ulogovan i da li je editor
+// Middleware za proveru da li je korisnik ulogovan (bilo ko)
+const ensureSignedIn = (req, res, next) => {
+  if (!req.session.user) {
+    return res.redirect('/auth/sign-in');
+  }
+  next();
+};
+
+// Middleware za proveru da li je korisnik editor
 const ensureEditor = async (req, res, next) => {
   if (!req.session.user) {
     return res.redirect('/auth/sign-in');
   }
   try {
     const currentUser = await User.findById(req.session.user._id);
-    if (currentUser.role !== 'editor') {
-      return res.redirect('/requests'); // Ako nije editor, vraćamo ga nazad na dashboard
+    if (!currentUser || currentUser.role !== 'editor') {
+      return res.redirect('/requests'); 
     }
-    next(); // Ako jeste editor, puštamo ga dalje
+    next();
   } catch (error) {
     console.log(error);
     res.redirect('/');
   }
 };
 
-// 1. Prikaz svih publikacija (ovo mogu da vide i jedni i drugi)
-router.get('/', ensureEditor, async (req, res) => {
+// 1. Prikaz svih publikacija (dostupno i editoru i procesoru)
+router.get('/', ensureSignedIn, async (req, res) => {
   try {
     const publications = await Publication.find({});
-    res.render('publications/index.ejs', { publications });
+    const currentUser = await User.findById(req.session.user._id);
+    
+    res.render('publications/index.ejs', { publications, currentUser });
   } catch (error) {
     console.log(error);
     res.redirect('/');

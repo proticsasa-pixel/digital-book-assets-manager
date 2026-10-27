@@ -7,7 +7,6 @@
 </head>
 <body>
 
-  <!-- Uključujemo naš navbar -->
   <%- include('../partials/navbar') %>
 
   <h1>Dashboard - Requests & Tasks</h1>
@@ -29,59 +28,10 @@
         <li>
           <strong>Publication:</strong> <%= task.publication ? task.publication.title : 'Unknown' %> <br>
           <strong>Description:</strong> <%= task.req_description %> <br>
-          <strong>File Location:</strong> <a href="<%= task.file_location %>" target="_blank">Open File</a> <br>
           <strong>Status:</strong> <%= task.status %> <br>
-          
-          <!-- Prikaz pojašnjenja / napomene ako postoji -->
-          <% if (task.clarificationNote) { %>
-            <br><strong>Napomena / Pojašnjenje:</strong> <%= task.clarificationNote %>
-          <% } %>
-          
-          <br>
           <strong>Assigned To:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Unassigned' %> <br>
-
-          <!-- 1. FORMA ZA PROCESORA -->
-          <% if (currentUser.role === 'processor') { %>
-            <form action="/requests/<%= task._id %>?_method=PUT" method="POST">
-              <br>
-              <label for="status">Status:</label>
-              <select name="status">
-                <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-                <option value="In Progress" <%= task.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-                <option value="Potrebno pojasnjenje" <%= task.status === 'Potrebno pojasnjenje' ? 'selected' : '' %>>Potrebno pojašnjenje</option>
-                <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
-              </select>
-
-              <br><br>
-              <label for="clarificationNote">Zatraži pojašnjenje od urednika:</label><br>
-              <textarea name="clarificationNote" rows="2" cols="40" placeholder="Unesite šta nije jasno..."><%= task.clarificationNote || '' %></textarea>
-
-              <br>
-              <button type="submit">Update Status (Processor)</button>
-            </form>
-          <% } %>
-
-          <!-- 2. FORMA ZA UREDNIKA (EDITOR) -->
-          <% if (currentUser.role === 'editor') { %>
-            <form action="/requests/<%= task._id %>?_method=PUT" method="POST">
-              <br>
-              <label for="status">Promeni status:</label>
-              <select name="status">
-                <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending (Vrati u red)</option>
-                <option value="In Progress" <%= task.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-                <option value="Potrebno pojasnjenje" <%= task.status === 'Potrebno pojasnjenje' ? 'selected' : '' %>>Potrebno pojašnjenje</option>
-                <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
-              </select>
-
-              <br><br>
-              <label for="clarificationNote">Odgovor / Pojašnjenje za procesora:</label><br>
-              <textarea name="clarificationNote" rows="2" cols="40" placeholder="Unesite odgovor ili dopunu..."><%= task.clarificationNote || '' %></textarea>
-
-              <br>
-              <button type="submit">Sačuvaj izmene (Editor)</button>
-            </form>
-          <% } %>
-
+          
+          <p><a href="/requests/<%= task._id %>">Details / Conversation &rarr;</a></p>
         </li>
         <hr>
       <% }) %>

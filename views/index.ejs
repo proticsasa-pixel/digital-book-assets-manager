@@ -14,13 +14,13 @@
   <p>Workflow management application</p>
 
   <% if (currentUser) { %>
-    <h2>Dobrodošli, <%= currentUser.username %>!</h2>
-    <p>Ulogovani ste kao: <strong><%= currentUser.role %></strong></p>
+    <h2>Wellcome!<%= currentUser.username %>!</h2>
+    <p>You are logged in as: <strong><%= currentUser.role %></strong></p>
     
     <% if (currentUser.role === 'editor') { %>
       <p><a href="/requests">Idi na Pregled Zahteva</a></p>
     <% } else if (currentUser.role === 'processor') { %>
-      <p><a href="/requests">Idi na Zadatke</a></p>
+      <p><a href="/requests">Go to Tasks</a></p>
     <% } %>
   <% } else { %>
     <p>Register to continue.</p>

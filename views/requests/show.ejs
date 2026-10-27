@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Request Details</title>
+</head>
+<body>
+
+  <%- include('../partials/navbar') %>
+
+  <p><a href="/requests">&larr; Back to Requests List</a></p>
+
+  <h1>Request Details</h1>
+
+  <div>
+    <p><strong>Publication:</strong> <%= task.publication ? task.publication.title : 'Unknown' %></p>
+    <p><strong>Description:</strong> <%= task.req_description %></p>
+    <p><strong>File Location:</strong> <a href="<%= task.file_location %>" target="_blank">Open File</a></p>
+    <p><strong>Current Status:</strong> <%= task.status %></p>
+    <p><strong>Assigned Processor:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Unassigned' %></p>
+  </div>
+
+  <hr>
+
+  <h2>Conversation & Notes</h2>
+
+  <% if (task.comments && task.comments.length > 0) { %>
+    <ul>
+      <% task.comments.forEach(comment => { %>
+        <li>
+          <strong><%= comment.author ? comment.author.username : 'User' %></strong> 
+          <i>(<%= comment.createdAt ? comment.createdAt.toLocaleString() : '' %>):</i>
+          <p><%= comment.text %></p>
+        </li>
+        <hr style="border: 0.5px solid #eee;">
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <p><i>No notes or messages for this request yet.</i></p>
+  <% } %>
+
+  <hr>
+
+  <h3>Add Message / Update Status</h3>
+  
+  <form action="/requests/<%= task._id %>?_method=PUT" method="POST">
+    <label for="status">Status:</label>
+    <select name="status">
+      <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+      <option value="In Progress" <%= task.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+      <option value="Needs Clarification" <%= task.status === 'Needs Clarification' ? 'selected' : '' %>>Needs Clarification</option>
+      <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+    </select>
+
+    <br><br>
+    <label for="commentText">New Message / Note:</label><br>
+    <textarea name="commentText" rows="3" cols="45" placeholder="Enter message or clarification..."></textarea>
+
+    <br><br>
+    <button type="submit">Send Message & Save Status</button>
+  </form>
+
+</body>
+</html>

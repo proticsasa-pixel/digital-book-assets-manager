@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create New User</title>
+</head>
+<body>
+
+  <%- include('../partials/navbar') %>
+
+  <p style="margin-top: 15px;">
+    <a href="/" style="text-decoration: none;">← Back to Home</a>
+  </p>
+
+  <h1>Create a New User Account</h1>
+  
+  <form action="/auth/new-user" method="POST">
+    <label for="username">Username:</label>
+    <input type="text" name="username" id="username" required />
+    <br><br>
+
+    <label for="email">Email:</label>
+    <input type="email" name="email" id="email" required />
+    <br><br>
+
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password" required />
+    <br><br>
+
+    <label for="confirmPassword">Confirm Password:</label>
+    <input type="password" name="confirmPassword" id="confirmPassword" required />
+    <br><br>
+    
+    <label for="role">Role:</label>
+    <select name="role" id="role">
+      <option value="editor">Editor</option>
+      <option value="processor">Processor</option>
+      <option value="admin">Admin</option>
+    </select>
+    <br><br>
+
+    <button type="submit">Create User</button>
+  </form>
+
+</body>
+</html>

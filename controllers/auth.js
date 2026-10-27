@@ -1,71 +1,42 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
-const User = require('../models/user.js');
-
-router.get('/sign-up', (req, res) => {
-  res.render('auth/sign-up.ejs');
-});
-
-router.get('/sign-in', (req, res) => {
-  res.render('auth/sign-in.ejs');
-});
-
-router.get('/sign-out', (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
-});
-
-router.post('/sign-up', async (req, res) => {
-  try {
-    // Check if the username is already taken
-    const userInDatabase = await User.findOne({ username: req.body.username });
-    if (userInDatabase) {
-      return res.send('Username already taken.');
-    }
-  
-    // Username is not taken already!
-    // Check if the password and confirm password match
-    if (req.body.password !== req.body.confirmPassword) {
-      return res.send('Password and Confirm Password must match');
-    }
-  
-    // Must hash the password before sending to the database
-    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
-    req.body.password = hashedPassword;
-  
-    // All ready to create the new user!
-    await User.create(req.body);
-  
-    res.redirect('/auth/sign-in');
-  } catch (error) {
-    console.log(error);
-    res.redirect('/');
+// Middleware za proveru da li je ulogovani korisnik admin
+function ensureAdmin(req, res, next) {
+  if (req.session.user && req.session.user.role === 'admin') {
+    return next();
   }
+  res.redirect('/');
+}
+
+// 1. Prikazforme za Sign In
+router.get('/sign-in', (req, res) => {
+  res.render('auth/sign-in.ejs', { errorMessage: null });
 });
 
+// 2. Obrada prijave (Sign In) - ASINHRONO + TRIMOVANJE
 router.post('/sign-in', async (req, res) => {
   try {
-    console.log("Pokušaj prijave za username:", req.body.email);
-    // First, get the user from the database
-    const userInDatabase = await User.findOne({ email: req.body.email });
+    // Trimujemo i stavljamo mala slova da ne zeza tipfeler
+    const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+
+    const userInDatabase = await User.findOne({ email: email });
     if (!userInDatabase) {
-      return res.send('Login failed. Please try again.');
+      return res.render('auth/sign-in.ejs', { errorMessage: 'Korisnik sa ovim email-om ne postoji.' });
     }
   
-    // There is a user! Time to test their password with bcrypt
-    const validPassword = bcrypt.compareSync(
+    // Asinhrono poređenje lozinki (ne koči server!)
+    const validPassword = await bcrypt.compare(
       req.body.password,
       userInDatabase.password
     );
+    
     if (!validPassword) {
-      return res.send('Login failed. Please try again.');
+      return res.render('auth/sign-in.ejs', { errorMessage: 'Pogrešna lozinka. Pokušaj ponovo.' });
     }
   
-    // There is a user AND they had the correct password. Time to make a session!
-    // Avoid storing the password, even in hashed format, in the session
-    // If there is other data you want to save to `req.session.user`, do so here!
     req.session.user = {
       email: userInDatabase.email,
       _id: userInDatabase._id,
@@ -75,7 +46,53 @@ router.post('/sign-in', async (req, res) => {
     res.redirect('/');
   } catch (error) {
     console.log(error);
+    res.render('auth/sign-in.ejs', { errorMessage: 'Došlo je do sistemske greške.' });
+  }
+});
+
+// 3. Odjava (Sign Out)
+router.get('/sign-out', (req, res) => {
+  req.session.destroy(() => {
     res.redirect('/');
+  });
+});
+
+
+// 4. Prikaz forme za novog korisnika (samo za admina)
+router.get('/new-user', ensureAdmin, (req, res) => {
+  res.render('auth/new-user.ejs', { errorMessage: null });
+});
+
+// 5. Čuvanje novog korisnika u bazi - ASINHRONO + TRIMOVANJE
+router.post('/new-user', ensureAdmin, async (req, res) => {
+  try {
+    const username = req.body.username ? req.body.username.trim() : '';
+    const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
+
+    const userInDatabase = await User.findOne({ username: username });
+    if (userInDatabase) {
+      return res.render('auth/new-user.ejs', { errorMessage: 'Korisničko ime je već zauzeto.' });
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+      return res.render('auth/new-user.ejs', { errorMessage: 'Lozinke se ne poklapaju.' });
+    }
+
+    // Asinhrono heširanje nove lozinke
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    
+    // Kreiramo objekat sa očišćenim podacima
+    await User.create({
+      username: username,
+      email: email,
+      password: hashedPassword,
+      role: req.body.role
+    });
+    
+    res.redirect('/');
+  } catch (error) {
+    console.log(error);
+    res.render('auth/new-user.ejs', { errorMessage: 'Greška pri kreiranju korisnika.' });
   }
 });
 

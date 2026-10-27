@@ -3,28 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital books assets manager</title>
+  <title>ZUNS Digital Assets</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
-<body>
+<body style="display: block; min-height: 100vh;">
 
-  <!-- Uključujemo naš sređeni navbar -->
-  <%- include('./partials/navbar') %>
-
-  <h1>Digital books assets manager</h1>
-  <p>Workflow management application</p>
-
-  <% if (currentUser) { %>
-    <h2>Wellcome!<%= currentUser.username %>!</h2>
-    <p>You are logged in as: <strong><%= currentUser.role %></strong></p>
+  <!-- Gornja navigaciona traka -->
+  <header class="navbar">
+    <a href="/" class="nav-brand">ZUNS Digital Assets</a>
     
-    <% if (currentUser.role === 'editor') { %>
-      <p><a href="/requests">Idi na Pregled Zahteva</a></p>
-    <% } else if (currentUser.role === 'processor') { %>
-      <p><a href="/requests">Go to Tasks</a></p>
-    <% } %>
-  <% } else { %>
-    <p>Register to continue.</p>
-  <% } %>
+    <nav class="nav-links">
+      <a href="/" class="active">Home</a>
+      <a href="/requests">Requests</a>
+      <a href="/requests/new">+ New Request</a>
+      <a href="/publications">Publications</a>
+      
+      <% if (typeof user !== 'undefined' && user) { %>
+        <span class="user-badge"><%= user.role %></span>
+        <a href="/auth/sign-out" style="color: var(--error-text);">Sign Out</a>
+      <% } else { %>
+        <a href="/auth/sign-in">Sign In</a>
+      <% } %>
+    </nav>
+  </header>
+
+  <!-- Sadržaj početne strane -->
+  <main class="page-content">
+    <h1 class="page-title">Digital books assets manager</h1>
+    <p class="subtitle">Workflow management application</p>
+
+    <div class="card-box">
+      <h2 style="font-size: 20px; margin-bottom: 12px;">Wellcome!</h2>
+      
+      <% if (typeof user !== 'undefined' && user) { %>
+        <p style="margin-bottom: 16px;">Prijavljeni ste sa ulogom: <strong><%= user.role %></strong></p>
+        <p><a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Idi na Pregled Zahteva</a></p>
+      <% } else { %>
+        <p style="margin-bottom: 16px;">Please log in to the system.</p>
+        <a href="/auth/sign-in" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Prijava</a>
+      <% } %>
+    </div>
+  </main>
 
 </body>
 </html>

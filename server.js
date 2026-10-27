@@ -30,6 +30,8 @@ app.use((req, res, next) => {
   next();
 });
 
+//pomocu ove linije Express dozvoljava ucitavanje fajlova iz public foldera
+app.use(express.static('public'));
 
 // 2. KONEKCIJA SA BAZOM
 mongoose.connect(process.env.MONGODB_URI);

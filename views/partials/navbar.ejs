@@ -9,15 +9,20 @@
   <div style="display: flex; gap: 15px; align-items: center;">
     
     <% if (!currentUser) { %>
-      <!-- 1. Ako KORISNIK NIJE ULOGOVAN (gost) -->
+      <!-- Ako KORISNIK NIJE ULOGOVAN (gost) - Nema više Sign Up! -->
       <a href="/auth/sign-in">Sign In</a>
-      <a href="/auth/sign-up">Sign Up</a>
 
     <% } else { %>
-      <!-- 2. Ako JE KORISNIK ULOGOVAN -->
-      
-      <!-- Zajednički link za sve ulogovane -->
+      <!-- Ako JE KORISNIK ULOGOVAN -->
       <a href="/">Home</a>
+
+      <!-- Ako je Admin -->
+      <% if (currentUser.role === 'admin') { %>
+        <a href="/auth/new-user">+ Create User</a>
+        <a href="/requests">Requests</a>
+        <a href="/publications">Publications</a>
+        <span style="color: #666; font-size: 0.9em;">(admin: <%= currentUser.username %>)</span>
+      <% } %>
 
       <!-- Ako je Urednik (Editor) -->
       <% if (currentUser.role === 'editor') { %>
@@ -34,9 +39,7 @@
         <span style="color: #666; font-size: 0.9em;">(processor: <%= currentUser.username %>)</span>
       <% } %>
 
-      <!-- Odjava za sve ulogovane -->
       <a href="/auth/sign-out" style="color: #d9534f; text-decoration: none;">Sign Out</a>
-      
     <% } %>
 
   </div>

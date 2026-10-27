@@ -62,8 +62,12 @@ router.post('/', async (req, res) => {
 // 4. Ažuriranje statusa zadatka (za procesora)
 router.put('/:id', async (req, res) => {
   try {
-    // Koristimo req.params.id za pretragu umesto req.body.id
-    await Request.findByIdAndUpdate(req.params.id, { status: req.body.status });
+    // Proveri da li ovde uzimaš i status i clarificationNote iz req.body
+    await Request.findByIdAndUpdate(req.params.id, {
+      status: req.body.status,
+      clarificationNote: req.body.clarificationNote // <--- OVO JE KLJUČNO DA SE SNIMI U BAZU
+    });
+    
     res.redirect('/requests');
   } catch (error) {
     console.log(error);

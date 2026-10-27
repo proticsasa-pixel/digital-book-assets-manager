@@ -3,12 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital books assets manager for the preparation and processing of multimedia assets</title>
+  <title>Digital books assets manager</title>
 </head>
-  <body>
-    <h1>Digital books assets manager</h1>
-    <p>for the preparation and processing of multimedia assets</p>
-    <a href="/auth/sign-up">Sign up</a>
-    <a href="/auth/sign-in">Sign in</a>
-  </body>
+<body>
+
+  <!-- Uključujemo naš sređeni navbar -->
+  <%- include('./partials/navbar') %>
+
+  <h1>Digital books assets manager</h1>
+  <p>Workflow management application</p>
+
+  <% if (currentUser) { %>
+    <h2>Dobrodošli, <%= currentUser.username %>!</h2>
+    <p>Ulogovani ste kao: <strong><%= currentUser.role %></strong></p>
+    
+    <% if (currentUser.role === 'editor') { %>
+      <p><a href="/requests">Idi na Pregled Zahteva</a></p>
+    <% } else if (currentUser.role === 'processor') { %>
+      <p><a href="/requests">Idi na Zadatke</a></p>
+    <% } %>
+  <% } else { %>
+    <p>Register to continue.</p>
+  <% } %>
+
+</body>
 </html>

@@ -22,6 +22,15 @@ app.use(
   })
 );
 
+
+//promenljiva user postaje dostupna u svakom navbaru sa ovim parcetom koda
+app.use((req, res, next) => {
+  res.locals.user = req.session.user || null;
+  res.locals.currentUser = req.session.user || null; // Dodali smo i ovo da podrži oba naziva
+  next();
+});
+
+
 // 2. KONEKCIJA SA BAZOM
 mongoose.connect(process.env.MONGODB_URI);
 

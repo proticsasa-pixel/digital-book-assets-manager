@@ -7,11 +7,15 @@ const requestSchema = new mongoose.Schema({
   file_location: { type: String, required: true },   // Lokacija fajla (link / putanja)
   status: { 
     type: String, 
-    enum: ['Pending', 'In Progress', 'Completed'], // Statusi prebačeni na engleski
+    enum: ['Pending', 'In Progress', 'Potrebno pojasnjenje', 'Completed'], // Dodato novo stanje
     default: 'Pending' 
   },
+  clarificationNote: { 
+    type: String, 
+    default: '' // Polje za tekst kada je potrebno pojašnjenje
+  },
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }    // Kome je dodeljeno (Processor)
-});
+}, { timestamps: true });
 
 const Request = mongoose.model('Request', requestSchema);
 

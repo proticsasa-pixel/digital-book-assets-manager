@@ -1,0 +1,42 @@
+<nav class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background-color: #f5f5f5; border-bottom: 1px solid #ccc;">
+  
+  <!-- Leva strana: Logo / Početna stranica -->
+  <div>
+    <a href="/" style="text-decoration: none; font-weight: bold; font-size: 1.1em;">ZUNS Digital Assets</a>
+  </div>
+
+  <!-- Desna strana: Dinamički linkovi na osnovu statusa prijave -->
+  <div style="display: flex; gap: 15px; align-items: center;">
+    
+    <% if (!currentUser) { %>
+      <!-- 1. Ako KORISNIK NIJE ULOGOVAN (gost) -->
+      <a href="/auth/sign-in">Sign In</a>
+      <a href="/auth/sign-up">Sign Up</a>
+
+    <% } else { %>
+      <!-- 2. Ako JE KORISNIK ULOGOVAN -->
+      
+      <!-- Zajednički link za sve ulogovane -->
+      <a href="/">Home</a>
+
+      <!-- Ako je Urednik (Editor) -->
+      <% if (currentUser.role === 'editor') { %>
+        <a href="/requests">Zahtevi</a>
+        <a href="/requests/new">+ Novi Zahtev</a>
+        <a href="/publications">Publikacije</a>
+        <span style="color: #666; font-size: 0.9em;">(editor: <%= currentUser.username %>)</span>
+      <% } %>
+
+      <!-- Ako je Procesor (Processor) -->
+      <% if (currentUser.role === 'processor') { %>
+        <a href="/requests">Zadaci / Zahtevi</a>
+        <span style="color: #666; font-size: 0.9em;">(processor: <%= currentUser.username %>)</span>
+      <% } %>
+
+      <!-- Odjava za sve ulogovane -->
+      <a href="/auth/sign-out" style="color: #d9534f; text-decoration: none;">Odjava</a>
+      
+    <% } %>
+
+  </div>
+</nav>

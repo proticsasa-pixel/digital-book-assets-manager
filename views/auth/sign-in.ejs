@@ -3,31 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In</title>
+  <title>Sign In - ZUNS</title>
   <link rel="stylesheet" href="/stylesheets/style.css">
+  
+  <!-- Centriranje za stranicu za prijavu -->
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+  </style>
 </head>
 <body>
 
   <div class="container">
-    <a href="/" class="back-link">← Nazad na početnu</a>
     <h1>Sign In</h1>
 
+    <!-- Prikaz poruke o grešci ako prijava ne uspije -->
     <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-      <div class="error-box"><%= errorMessage %></div>
+      <div class="error-box">
+        <%= errorMessage %>
+      </div>
     <% } %>
 
+    <!-- Forma za prijavu preko email-a -->
     <form action="/auth/sign-in" method="POST">
+      
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" name="email" id="email" placeholder="ime@primjer.com" required />
+        <input type="email" id="email" name="email" placeholder="name@example.com" required autocomplete="email">
       </div>
-      
+
       <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" name="password" id="password" placeholder="••••••••" required />
+        <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
       </div>
-      
-      <button type="submit">Prijavi se</button>
+
+      <button type="submit">Sign In</button>
     </form>
   </div>
 

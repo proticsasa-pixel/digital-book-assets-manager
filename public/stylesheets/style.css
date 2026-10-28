@@ -19,15 +19,17 @@
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-main);
   line-height: 1.5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
 }
 
 /* --- GLAVNI KONTEJNER (KARTICA) --- */
@@ -41,7 +43,7 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
 }
 
-/* --- TIHOMI I TEKSTOVI --- */
+/* --- NASLOVI I TEKSTOVI --- */
 h1 {
   font-size: 24px;
   font-weight: 600;
@@ -151,7 +153,6 @@ a:hover {
   margin-bottom: 12px;
 }
 
-
 /* --- GORNJA NAVIGACIJA (NAVBAR) --- */
 .navbar {
   display: flex;
@@ -214,12 +215,14 @@ a:hover {
   font-weight: 700;
   letter-spacing: -0.5px;
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .subtitle {
   color: var(--text-muted);
   font-size: 15px;
   margin-bottom: 30px;
+  text-align: center;
 }
 
 .card-box {
@@ -228,4 +231,18 @@ a:hover {
   border-radius: var(--radius);
   padding: 24px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  text-align: center;
+}
+
+/* --- POMOĆNE KLASE ZA RASPORED STRANICA --- */
+.page-body {
+  display: block;
+  min-height: 100vh;
+}
+
+.auth-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }

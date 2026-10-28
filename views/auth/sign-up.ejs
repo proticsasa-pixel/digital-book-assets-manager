@@ -1,39 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign Up</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - ZUNS</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
-<body>
-<!-- povratak na pocetnu stranu -->
-<p style="margin-top: 15px;">
-  <a href="/" style="text-decoration: none;">← Nazad na početnu stranu</a>
-</p>
-  <h1>Create a new account!</h1>
-  <form action="/auth/sign-up" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username" required />
-    <label for="password">Password:</label>
-    <input type="password" name="password" id="password" required />
-    <label for="confirmPassword">Confirm Password:</label>
-    <input 
-    type="password"
-    name="confirmPassword"
-    id="confirmPassword"
-    required 
-    />
-    
-    <label for="email">Email:</label>
-    <input type="email" name="email" id="email" required />
-    
-    <label for="role">Role:</label>
-    <select name="role">
-      <option value="editor">Editor</option>
-      <option value="processor">Designer/Text reviewer</option>
-    </select>
+<body class="auth-body">
 
-    <button type="submit">Sign up</button>
-  </form>
+  <div class="container">
+    <h1>Sign In</h1>
+
+    <!-- Prikaz poruke o grešci ako prijava ne uspije -->
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="error-box">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <!-- Forma za prijavu preko email-a -->
+    <form action="/auth/sign-in" method="POST">
+      
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password">
+      </div>
+
+      <button type="submit">Sign In</button>
+    </form>
+  </div>
+
 </body>
 </html>

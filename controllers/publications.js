@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Publication = require('../models/publication.js');
+const Request = require('../models/request.js'); // Dodato da bismo mogli da brišemo i zahteve
 const User = require('../models/user.js');
 
 // Middleware za proveru da li je korisnik ulogovan (bilo ko)
@@ -55,6 +56,24 @@ router.post('/', ensureEditor, async (req, res) => {
   } catch (error) {
     console.log(error);
     res.redirect('/publications/new');
+  }
+});
+
+// 4. Brisanje publikacije I svih povezanih zahteva (SAMO za editora)
+router.delete('/:id', ensureEditor, async (req, res) => {
+  try {
+    const publicationId = req.params.id;
+
+    // Prvo brišemo sve zahteve koji su vezani za ovu publikaciju da ne ostanu "siročići"
+    await Request.deleteMany({ publication: publicationId });
+
+    // Zatim brišemo samu publikaciju
+    await Publication.findByIdAndDelete(publicationId);
+
+    res.redirect('/publications');
+  } catch (error) {
+    console.log(error);
+    res.redirect('/publications');
   }
 });
 

@@ -111,4 +111,16 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+
+router.delete('/:id', async (req, res) => {
+  try {
+    await Request.findByIdAndDelete(req.params.id); // Prilagodi metod u zavisnosti od baze koju koristiš
+    res.redirect('/requests');
+  } catch (err) {
+    console.log(err);
+    res.redirect('/requests');
+  }
+});
+
+
 module.exports = router;

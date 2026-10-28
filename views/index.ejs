@@ -6,18 +6,26 @@
   <title>ZUNS Digital Assets</title>
   <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
-<body style="display: block; min-height: 100vh;">
+<body style="display: block; min-height: 100vh; background-color: var(--bg-color);">
 
-  <!-- Gornja navigaciona traka -->
+  <!-- Gornja navigacija -->
   <header class="navbar">
     <a href="/" class="nav-brand">ZUNS Digital Assets</a>
     
     <nav class="nav-links">
-      <a href="/" class="active">Home</a>
-      <a href="/requests">Requests</a>
-      <a href="/requests/new">+ New Request</a>
-      <a href="/publications">Publications</a>
+      <% if (currentUser) { %>
+        <a href="/" class="active">Home</a>
+        <a href="/requests">Requests</a>
+        <% if (currentUser.role === 'editor') { %>
+          <a href="/requests/new">New Request</a>
+        <% } %>
+        <a href="/publications">Publications</a>
+      <% } %>
       
+      <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'admin') { %>
+        <a href="/auth/new-user">Create User</a>
+      <% } %>
+
       <% if (typeof user !== 'undefined' && user) { %>
         <span class="user-badge"><%= user.role %></span>
         <a href="/auth/sign-out" style="color: var(--error-text);">Sign Out</a>
@@ -27,22 +35,45 @@
     </nav>
   </header>
 
-  <!-- Sadržaj početne strane -->
-  <main class="page-content">
-    <h1 class="page-title">Digital books assets manager</h1>
-    <p class="subtitle">Workflow management application</p>
-
-    <div class="card-box">
-      <h2 style="font-size: 20px; margin-bottom: 12px;">Wellcome!</h2>
-      
-      <% if (typeof user !== 'undefined' && user) { %>
-        <p style="margin-bottom: 16px;">Prijavljeni ste sa ulogom: <strong><%= user.role %></strong></p>
-        <p><a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Idi na Pregled Zahteva</a></p>
-      <% } else { %>
-        <p style="margin-bottom: 16px;">Please log in to the system.</p>
-        <a href="/auth/sign-in" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Prijava</a>
-      <% } %>
+  <!-- Glavni sadržaj -->
+  <main class="page-content" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+    
+    <!-- Naslov aplikacije -->
+    <div style="margin-bottom: 30px;">
+      <h1 class="page-title" style="font-size: 26px; margin-bottom: 6px;">Digital books assets manager</h1>
+      <p class="subtitle">Workflow management application</p>
     </div>
+
+    <!-- Prikazuje kartice SAMO AKO JE KORISNIK ULOGOVAN -->
+    <% if (currentUser) { %>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        
+        <!-- Kartica 1: Zahtevi -->
+        <div class="card-box" style="text-align: left; margin: 0;">
+          <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Upravljanje zahtevima</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Pregledajte sve aktivne zahteve, statuse i prateću dokumentaciju.</p>
+          <a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Pregled zahteva</a>
+        </div>
+
+        <!-- Kartica 2: Novi zahtev (Samo za urednike/administratore ako treba, ili ostaje) -->
+        <% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
+          <div class="card-box" style="text-align: left; margin: 0;">
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Novi unos</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Kreirajte novi zahtev za digitalne materijale ili publikacije.</p>
+            <a href="/requests/new" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #0f172a;">+ Kreiraj zahtev</a>
+          </div>
+        <% } %>
+
+        <!-- Kartica 3: Publikacije -->
+        <div class="card-box" style="text-align: left; margin: 0;">
+          <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Publikacije</h3>
+          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Biblioteka i pregled izdvojenih izdanja i pratećih resursa.</p>
+          <a href="/publications" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #475569;">Lista publikacija</a>
+        </div>
+
+      </div>
+    <% } %>
+
   </main>
 
 </body>

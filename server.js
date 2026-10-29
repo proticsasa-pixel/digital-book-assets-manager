@@ -1,6 +1,3 @@
-// const dns = require("node:dns/promises");
-// dns.setServers(["1.1.1.1", "8.8.8.8"]);
-
 const path = require("path");
 const dotenv = require('dotenv');
 dotenv.config();
@@ -33,8 +30,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Omogućavanje učitavanja fajlova iz public foldera
-app.use(express.static('public'));
+// Podesavanje view engine-a i foldera
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
 
 // 2. KONEKCIJA SA BAZOM
 mongoose.connect(process.env.MONGODB_URI);
@@ -42,11 +41,6 @@ mongoose.connect(process.env.MONGODB_URI);
 mongoose.connection.on('connected', () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
-
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
-
 
 // 3. KONTROLERI I RUTE
 const authController = require('./controllers/auth.js');
@@ -58,23 +52,26 @@ app.use('/requests', requestsController);
 const publicationsController = require('./controllers/publications.js');
 app.use('/publications', publicationsController);
 
-// Početna ruta sa proširenim brojanjem (Pending i Needs Clarification)
+// Početna ruta sa proširenim brojanjem (Pending i Needs Clarification) i bezbednim ID-jem
 app.get('/', async (req, res) => {
   try {
     let newRequestsCount = 0;
 
     if (req.session.user) {
       const currentUser = req.session.user;
-      
-      // Definišemo uslov za statuse na koje treba skrenuti pažnju
       const statusCondition = { $in: ['Pending', 'Needs Clarification'] };
 
       if (currentUser.role === 'editor' || currentUser.role === 'admin') {
-        // Urednik/admin vidi sve zahteve sa ovim statusima
         newRequestsCount = await Request.countDocuments({ status: statusCondition });
       } else {
-        // Procesor vidi samo svoje zahteve sa ovim statusima
-        newRequestsCount = await Request.countDocuments({ assignedTo: currentUser._id, status: statusCondition });
+        const userId = mongoose.Types.ObjectId.isValid(currentUser._id) 
+          ? new mongoose.Types.ObjectId(currentUser._id) 
+          : currentUser._id;
+        
+        newRequestsCount = await Request.countDocuments({ 
+          assignedTo: userId, 
+          status: statusCondition 
+        });
       }
     }
 
@@ -83,7 +80,7 @@ app.get('/', async (req, res) => {
       newRequestsCount: newRequestsCount
     });
   } catch (error) {
-    console.log(error);
+    console.error("GREŠKA NA POČETNOJ RUTI:", error);
     res.render('index.ejs', {
       user: req.session.user,
       newRequestsCount: 0
@@ -93,7 +90,9 @@ app.get('/', async (req, res) => {
 
 const port = process.env.PORT ? process.env.PORT : '3000';
 
+// Ako koristiš Vercel (exportujemo app), a ako testiraš lokalno preko node server.js otkomentariši app.listen
 // app.listen(port, () => {
 //   console.log(`The express app is ready on port ${port}!`);
 // });
+
 module.exports = app;

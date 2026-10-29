@@ -35,10 +35,13 @@
   <!-- Glavni sadržaj -->
   <main class="page-content" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
     
-    <!-- Naslov aplikacije -->
+    <!-- Naslov aplikacije sa finom plavom linijom -->
     <div style="margin-bottom: 30px;">
-      <h1 class="page-title" style="font-size: 26px; margin-bottom: 6px;">Digital books assets manager</h1>
-      <p class="subtitle">Workflow management application</p>
+      <h1 class="page-title" style="font-size: 34px; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">Digital books assets manager</h1>
+      <p class="subtitle" style="font-size: 16px; color: var(--text-muted); margin: 0 0 16px 0;">Workflow management application</p>
+      
+      <!-- Fina plava linija -->
+      <hr style="border: none; height: 3px; background-color: #3b82f6; width: 100%; border-radius: 2px; margin: 0;">
     </div>
 
    <!-- FENSI GRAFIČKO UPOZORENJE ZA ZADATKE KOJI ZAHTEVAJU PAŽNJU -->
@@ -47,14 +50,14 @@
         
         <div style="display: flex; align-items: center; gap: 14px;">
           <!-- Pulsirajuća tačkica i brojač u krugu -->
-          <span style="position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; font-weight: bold; font-size: 14px;">
+          <span style="position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(134, 109, 109, 0.2); border-radius: 50%; font-weight: bold; font-size: 14px;">
             <span style="animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; position: absolute; display: inline-flex; height: 100%; width: 100%; border-radius: 50%; background-color: #93c5fd; opacity: 0.75;"></span>
             <span style="position: relative;"><%= newRequestsCount %></span>
           </span>
           
           <div>
             <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Zahtevi zahtevaju vašu pažnju</h4>
-            <p style="margin: 2px 0 0 0; font-size: 14px; opacity: 0.9;">
+            <p style="margin: 2px 0 0 0; font-size: 14px; opacity: 0.9; color: #ffffff; opacity: 0.9;">
               Imate <strong><%= newRequestsCount %></strong> <%= newRequestsCount == 1 ? 'aktivan zadatak' : 'aktivna zadatka' %> (na čekanju ili traže pojašnjenje).
             </p>
           </div>

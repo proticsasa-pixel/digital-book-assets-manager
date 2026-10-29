@@ -40,7 +40,7 @@
 
       <!-- Dugme za brisanje - VIDLJIVO SAMO ZA EDITOR-a I ADMIN-a -->
       <% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
-        <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; paddingTop: 15px;">
+        <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
           <form action="/requests/<%= task._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovaj zahtev?');">
             <button type="submit" style="background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: 500;">Delete Request</button>
           </form>

@@ -1,6 +1,7 @@
-const dns = require("node:dns/promises");
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
+// const dns = require("node:dns/promises");
+// dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
+const path = require("path");
 const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
@@ -41,6 +42,11 @@ mongoose.connect(process.env.MONGODB_URI);
 mongoose.connection.on('connected', () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.static(path.join(__dirname, "public")));
+
 
 // 3. KONTROLERI I RUTE
 const authController = require('./controllers/auth.js');
@@ -87,6 +93,7 @@ app.get('/', async (req, res) => {
 
 const port = process.env.PORT ? process.env.PORT : '3000';
 
-app.listen(port, () => {
-  console.log(`The express app is ready on port ${port}!`);
-});
+// app.listen(port, () => {
+//   console.log(`The express app is ready on port ${port}!`);
+// });
+module.exports = app;

@@ -6,10 +6,10 @@
 ***
 
 ### ***Description***
-####  This is a MEN (MongoDB, Express.js, Node.js) workflow management application designed 
+####  This is a MEN (MongoDB, Express.js, Node.js) workflow management application designed
 ####  for editors overseeing digital educational textbooks. The system allows editors to track, coordinate, 
 ####  and assign requests for the preparation and processing of multimedia assets—such as images, videos, and audio 
-####  files—destined for digital publications..
+####  files—destined for digital publications.
 ***
 
 ### ***Technologies Used***
@@ -27,10 +27,12 @@
 ### ***Getting Started***
 
 #### 
-* Once ready, click the "Start Quiz" button.
-* Read short instructio and satrt answering the questions.
-* Main goal is to collect maximum of 15 points.
-* Enjoy yourself!
+* When you first open the application, you are greeted with a clean and modern landing page.
+* Click Sign In in the top navigation bar to log into your account using your assigned username and password.
+* Smart Alert Banner: Upon logging in, if there are any pending tasks or requests requiring your attention 
+  (statuses such as Pending or Needs Clarification), a prominent blue alert banner with a pulsing counter will 
+  appear right at the top. It displays the exact number of active tasks waiting for you. Clicking the "Review requests" 
+  button will take you straight to your task list.
 ***
 
 ### ***Future Updates***

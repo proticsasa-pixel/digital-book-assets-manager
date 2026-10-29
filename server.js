@@ -10,7 +10,7 @@ const session = require('express-session');
 
 const Request = require('./models/request.js');
 
-// Middleware
+// 1. OSNOVNI MIDDLEWARE
 app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 app.use(
@@ -27,11 +27,12 @@ app.use((req, res, next) => {
   next();
 });
 
+// 2. PUTANJE (Koristimo process.cwd() da bi Vercel sigurno našao views i public foldere)
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-app.use(express.static(path.join(__dirname, "public")));
+app.set("views", path.join(process.cwd(), "views"));
+app.use(express.static(path.join(process.cwd(), "public")));
 
-// Konekcija ka bazi (prilagođena za serverless da ne otvara duple konekcije)
+// 3. KONEKCIJA SA BAZOM ZA SERVERLESS
 let isConnected = false;
 async function connectDB() {
   if (isConnected || mongoose.connection.readyState >= 1) {
@@ -46,7 +47,7 @@ async function connectDB() {
   }
 }
 
-// Rute
+// 4. KONTROLERI I RUTE
 const authController = require('./controllers/auth.js');
 app.use('/auth', authController);
 
@@ -56,7 +57,7 @@ app.use('/requests', requestsController);
 const publicationsController = require('./controllers/publications.js');
 app.use('/publications', publicationsController);
 
-// Početna ruta sa obaveznom konekcijom i bezbednim try/catch
+// Početna ruta
 app.get('/', async (req, res) => {
   try {
     await connectDB();

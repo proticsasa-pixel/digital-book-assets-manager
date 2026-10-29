@@ -1,9 +1,9 @@
 // const dns = require("node:dns/promises");
 // dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
-const path = require("path");
 const dotenv = require('dotenv');
 dotenv.config();
+const path = require("path");
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -12,7 +12,7 @@ const morgan = require('morgan');
 const session = require('express-session');
 
 // Uvoz Request modela radi brojanja zahteva
-const Request = require('../models/request.js');
+const Request = require('./models/request.js');
 
 // 1. PRVO OSNOVNI MIDDLEWARE
 app.use(express.urlencoded({ extended: false }));

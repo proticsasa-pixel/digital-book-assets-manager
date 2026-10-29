@@ -10,7 +10,10 @@ const methodOverride = require('method-override');
 const morgan = require('morgan');
 const session = require('express-session');
 
-// 1. PRVO OSNOVNI MIDDLEWARE (ovo je moralo na vrh da bi Express čitao podatke iz forme!)
+// Uvoz Request modela radi brojanja zahteva
+const Request = require('./models/request.js');
+
+// 1. PRVO OSNOVNI MIDDLEWARE
 app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 // app.use(morgan('dev'));
@@ -22,15 +25,14 @@ app.use(
   })
 );
 
-
-//promenljiva user postaje dostupna u svakom navbaru sa ovim parcetom koda
+// Promenljiva user postaje dostupna u svakom navbaru
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
-  res.locals.currentUser = req.session.user || null; // Dodali smo i ovo da podrži oba naziva
+  res.locals.currentUser = req.session.user || null;
   next();
 });
 
-//pomocu ove linije Express dozvoljava ucitavanje fajlova iz public foldera
+// Omogućavanje učitavanja fajlova iz public foldera
 app.use(express.static('public'));
 
 // 2. KONEKCIJA SA BAZOM
@@ -40,7 +42,7 @@ mongoose.connection.on('connected', () => {
   console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
 });
 
-// 3. KONTROLERI I RUTE (sada dolaze nakon middleware-a)
+// 3. KONTROLERI I RUTE
 const authController = require('./controllers/auth.js');
 app.use('/auth', authController);
 
@@ -50,11 +52,37 @@ app.use('/requests', requestsController);
 const publicationsController = require('./controllers/publications.js');
 app.use('/publications', publicationsController);
 
-// Početna ruta
-app.get('/', (req, res) => {
-  res.render('index.ejs', {
-    user: req.session.user,
-  });
+// Početna ruta sa proširenim brojanjem (Pending i Needs Clarification)
+app.get('/', async (req, res) => {
+  try {
+    let newRequestsCount = 0;
+
+    if (req.session.user) {
+      const currentUser = req.session.user;
+      
+      // Definišemo uslov za statuse na koje treba skrenuti pažnju
+      const statusCondition = { $in: ['Pending', 'Needs Clarification'] };
+
+      if (currentUser.role === 'editor' || currentUser.role === 'admin') {
+        // Urednik/admin vidi sve zahteve sa ovim statusima
+        newRequestsCount = await Request.countDocuments({ status: statusCondition });
+      } else {
+        // Procesor vidi samo svoje zahteve sa ovim statusima
+        newRequestsCount = await Request.countDocuments({ assignedTo: currentUser._id, status: statusCondition });
+      }
+    }
+
+    res.render('index.ejs', {
+      user: req.session.user,
+      newRequestsCount: newRequestsCount
+    });
+  } catch (error) {
+    console.log(error);
+    res.render('index.ejs', {
+      user: req.session.user,
+      newRequestsCount: 0
+    });
+  }
 });
 
 const port = process.env.PORT ? process.env.PORT : '3000';

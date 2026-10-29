@@ -16,9 +16,6 @@
       <% if (currentUser) { %>
         <a href="/">Home</a>
         <a href="/requests">Requests</a>
-        <!-- <% if (currentUser.role === 'editor') { %>
-          <a href="/requests/new">New Request</a>
-        <% } %> -->
         <a href="/publications">Publications</a>
       <% } %>
       
@@ -28,7 +25,7 @@
 
       <% if (typeof user !== 'undefined' && user) { %>
         <span class="user-badge"><%= user.role %></span>
-        <a href="/auth/sign-out";">Sign Out</a>
+        <a href="/auth/sign-out">Sign Out</a>
       <% } else { %>
         <a href="/auth/sign-in">Sign In</a>
       <% } %>
@@ -44,40 +41,68 @@
       <p class="subtitle">Workflow management application</p>
     </div>
 
+   <!-- FENSI GRAFIČKO UPOZORENJE ZA ZADATKE KOJI ZAHTEVAJU PAŽNJU -->
+    <% if (currentUser && typeof newRequestsCount !== 'undefined' && newRequestsCount > 0) { %>
+      <div style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 16px 24px; border-radius: 8px; margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);">
+        
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <!-- Pulsirajuća tačkica i brojač u krugu -->
+          <span style="position: relative; display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; font-weight: bold; font-size: 14px;">
+            <span style="animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; position: absolute; display: inline-flex; height: 100%; width: 100%; border-radius: 50%; background-color: #93c5fd; opacity: 0.75;"></span>
+            <span style="position: relative;"><%= newRequestsCount %></span>
+          </span>
+          
+          <div>
+            <h4 style="margin: 0; font-size: 16px; font-weight: 600;">Zahtevi zahtevaju vašu pažnju</h4>
+            <p style="margin: 2px 0 0 0; font-size: 14px; opacity: 0.9;">
+              Imate <strong><%= newRequestsCount %></strong> <%= newRequestsCount == 1 ? 'aktivan zadatak' : 'aktivna zadatka' %> (na čekanju ili traže pojašnjenje).
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <a href="/requests" style="background: white; color: #1d4ed8; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            Pregled zahteva &rarr;
+          </a>
+        </div>
+
+      </div>
+
+      <style>
+        @keyframes ping {
+          75%, 100% {
+            transform: scale(1.6);
+            opacity: 0;
+          }
+        }
+      </style>
+    <% } %>
+
     <!-- Prikazuje kartice SAMO AKO JE KORISNIK ULOGOVAN -->
     <% if (currentUser) { %>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
         
         <!-- Kartica 1: Zahtevi -->
-<div class="card-box" style="text-align: left; margin: 0; display: flex; flex-direction: column; height: 100%;">
-  <div style="flex-grow: 1;">
-    <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Request management</h3>
-    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">View all active requests, statuses, and supporting documentation.</p>
-  </div>
-  <div>
-    <a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Review of requests</a>
-  </div>
-</div>
-
-        <!-- Kartica 2: Novi zahtev (Samo za urednike/administratore ako treba, ili ostaje) -->
-        <!--<% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
-          <div class="card-box" style="text-align: left; margin: 0;">
-            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Novi unos</h3>
-            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Kreirajte novi zahtev za digitalne materijale ili publikacije.</p>
-            <a href="/requests/new" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #0f172a;">+ Kreiraj zahtev</a>
+        <div class="card-box" style="text-align: left; margin: 0; display: flex; flex-direction: column; height: 100%;">
+          <div style="flex-grow: 1;">
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Request management</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">View all active requests, statuses, and supporting documentation.</p>
           </div>
-        <% } %> -->
+          <div>
+            <a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Review of requests</a>
+          </div>
+        </div>
 
-     <!-- Kartica 3: Publikacije -->
-<div class="card-box" style="text-align: left; margin: 0; display: flex; flex-direction: column; height: 100%;">
-  <div style="flex-grow: 1;">
-    <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Publications</h3>
-    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">List and overview of separate releases and supporting resources.</p>
-  </div>
-  <div>
-    <a href="/publications" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #2563eb; color: white;">Publications list</a>
-  </div>
-</div>
+        <!-- Kartica 2: Publikacije -->
+        <div class="card-box" style="text-align: left; margin: 0; display: flex; flex-direction: column; height: 100%;">
+          <div style="flex-grow: 1;">
+            <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Publications</h3>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">List and overview of separate releases and supporting resources.</p>
+          </div>
+          <div>
+            <a href="/publications" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #2563eb; color: white;">Publications list</a>
+          </div>
+        </div>
 
       </div>
     <% } %>

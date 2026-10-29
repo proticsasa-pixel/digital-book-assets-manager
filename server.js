@@ -8,41 +8,45 @@ const methodOverride = require('method-override');
 const morgan = require('morgan');
 const session = require('express-session');
 
-// Uvoz Request modela radi brojanja zahteva
 const Request = require('./models/request.js');
 
-// 1. PRVO OSNOVNI MIDDLEWARE
+// Middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
-// app.use(morgan('dev'));
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'fallback_secret',
     resave: false,
     saveUninitialized: true,
   })
 );
 
-// Promenljiva user postaje dostupna u svakom navbaru
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.currentUser = req.session.user || null;
   next();
 });
 
-// Podesavanje view engine-a i foldera
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// 2. KONEKCIJA SA BAZOM
-mongoose.connect(process.env.MONGODB_URI);
+// Konekcija ka bazi (prilagođena za serverless da ne otvara duple konekcije)
+let isConnected = false;
+async function connectDB() {
+  if (isConnected || mongoose.connection.readyState >= 1) {
+    return;
+  }
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    isConnected = true;
+    console.log("Connected to MongoDB.");
+  } catch (err) {
+    console.error("MongoDB connection error:", err);
+  }
+}
 
-mongoose.connection.on('connected', () => {
-  console.log(`Connected to MongoDB ${mongoose.connection.name}.`);
-});
-
-// 3. KONTROLERI I RUTE
+// Rute
 const authController = require('./controllers/auth.js');
 app.use('/auth', authController);
 
@@ -52,9 +56,10 @@ app.use('/requests', requestsController);
 const publicationsController = require('./controllers/publications.js');
 app.use('/publications', publicationsController);
 
-// Početna ruta sa proširenim brojanjem (Pending i Needs Clarification) i bezbednim ID-jem
+// Početna ruta sa obaveznom konekcijom i bezbednim try/catch
 app.get('/', async (req, res) => {
   try {
+    await connectDB();
     let newRequestsCount = 0;
 
     if (req.session.user) {
@@ -88,11 +93,5 @@ app.get('/', async (req, res) => {
   }
 });
 
-const port = process.env.PORT ? process.env.PORT : '3000';
-
-// Ako koristiš Vercel (exportujemo app), a ako testiraš lokalno preko node server.js otkomentariši app.listen
-// app.listen(port, () => {
-//   console.log(`The express app is ready on port ${port}!`);
-// });
-
+// Eksport za Vercel serverless
 module.exports = app;

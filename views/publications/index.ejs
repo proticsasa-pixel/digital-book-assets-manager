@@ -1,63 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista publikacija - ZUNS</title>
+  <title>Spisak publikacija</title>
   <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
-<body style="display: block; min-height: 100vh; background-color: var(--bg-color);">
-
-  <!-- Uključujemo zajednički navbar -->
+<body>
+  
+  <!-- Navbar -->
   <%- include('../partials/navbar') %>
 
-  <!-- Glavni sadržaj -->
-  <main class="page-content" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+  <!-- Glavni centrirani kontejner -->
+  <div class="container" style="max-width: 900px; margin: 40px auto; padding: 0 20px;">
     
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-      <div>
-        <h1 class="page-title" style="font-size: 26px; margin-bottom: 6px;">Publikacije</h1>
-        <p class="subtitle">Pregled svih izdvojenih izdanja i pratećih resursa</p>
-      </div>
+    <!-- Link za povratak jedan korak unazad -->
+    <div style="margin-bottom: 20px;">
+      <a href="javascript:history.back()" style="display: inline-block; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500;">
+        &larr; Back
+      </a>
+    </div>
+
+    <!-- Centrirano zaglavlje: Naslov, podnaslov i suženo dugme na sredini -->
+    <div style="text-align: center; margin-bottom: 32px;">
+      <h1 style="margin: 0 0 6px 0; font-size: 28px; font-weight: 700; color: #0f172a;">Publications</h1>
+      <p style="margin: 0 0 16px 0; color: #64748b; font-size: 14px;">Overview of all separate releases and supporting resources</p>
       
-      <!-- Samo editor može da doda novu publikaciju -->
-      <% if (currentUser && currentUser.role === 'editor') { %>
-        <a href="/publications/new" class="btn" style="text-decoration: none; padding: 10px 16px; background-color: #0f172a; color: white; border-radius: 6px;">+ Nova publikacija</a>
+      <!-- Suženo plavo dugme za novu publikaciju (opciono, ako želiš da i ovo vide samo urednici, stavi i ovde uslov, mada obično samo urednici prave publikacije) -->
+      <% if (currentUser && (currentUser.role === 'editor' || currentUser.role === 'admin')) { %>
+        <a href="/publications/new" class="btn" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; width: auto;">
+          New Publication
+        </a>
       <% } %>
     </div>
 
-    <!-- Lista publikacija -->
-    <div style="display: flex; flex-direction: column; gap: 15px;">
-      <% if (publications && publications.length > 0) { %>
+    <!-- Provera da li ima publikacija za prikaz -->
+    <% if (publications && publications.length > 0) { %>
+      <div class="publications-list" style="display: flex; flex-direction: column; gap: 12px;">
         <% publications.forEach(pub => { %>
-          <div class="card-box" style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+          <div style="background: #ffffff; border: 1px solid #e2e8f0; padding: 16px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            
+            <!-- Podaci o publikaciji -->
             <div>
-              <!-- Prikazujemo tačne podatke iz tvog modela -->
-              <h3 style="font-size: 18px; margin-bottom: 6px; color: var(--text-main);"><%= pub.title %></h3>
-              <p style="font-size: 14px; color: var(--text-muted); margin: 0;">
-                Predmet: <strong><%= pub.subject %></strong> | Razred: <strong><%= pub.grade %></strong> 
-                <% if (pub.owner) { %> | Autor/Vlasnik: <strong><%= pub.owner %></strong> <% } %>
+              <h3 style="margin: 0 0 4px 0; font-size: 18px; color: #1e293b;"><%= pub.title %></h3>
+              <p style="margin: 0; color: #475569; font-size: 14px;">
+                Razred: <%= pub.grade %> | Predmet: <%= pub.subject %> 
+                <% if (pub.owner) { %> | Vlasnik/Urednik: <%= pub.owner.username %> <% } %>
               </p>
             </div>
 
-            <!-- Akcije (Brisanje publikacije i povezanih zahteva) -->
-            <div>
-              <% if (currentUser && currentUser.role === 'editor') { %>
-                <form action="/publications/<%= pub._id %>?_method=DELETE" method="POST" style="display:inline;" onsubmit="return confirm('PAŽNJA: Brisanjem ove publikacije trajno se brišu i svi povezani zahtevi! Da li ste sigurni?');">
-                  <button type="submit" style="background-color: #d9534f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: 500;">
-                    Obriši
+            <!-- Dugme za brisanje - VIDLJIVO SAMO ZA EDITOR-a I ADMIN-a -->
+            <% if (currentUser && (currentUser.role === 'editor' || currentUser.role === 'admin')) { %>
+              <div>
+                <form action="/publications/<%= pub._id %>?_method=DELETE" method="POST" style="margin: 0;" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovu publikaciju?');">
+                  <button type="submit" class="btn" style="background-color: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                    Delete
                   </button>
                 </form>
-              <% } %>
-            </div>
+              </div>
+            <% } %>
+
           </div>
         <% }) %>
-      <% } else { %>
-        <p style="color: var(--text-muted);">Trenutno nema unetih publikacija u bazi.</p>
-      <% } %>
-    </div>
+      </div>
+    <% } else { %>
+      <!-- Poruka ako nema izabranih ili dostupnih publikacija -->
+      <p style="text-align: center; color: #64748b; font-style: italic; margin-top: 40px;">
+        No publications selected or available.
+      </p>
+    <% } %>
 
-  </main>
+  </div>
 
 </body>
 </html>

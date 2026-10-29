@@ -5,7 +5,7 @@ const Request = require('../models/request.js');
 const Publication = require('../models/publication.js');
 const User = require('../models/user.js');
 
-// 1. Prikaz Dashboard-a (razlikuje se u zavisnosti od uloge)
+// 1. Prikaz Dashboard-a (i za editora i za admina prikazuje sve zadatke)
 router.get('/', async (req, res) => {
   try {
     if (!req.session.user) {
@@ -15,7 +15,8 @@ router.get('/', async (req, res) => {
     const currentUser = await User.findById(req.session.user._id);
 
     let tasks = [];
-    if (currentUser.role === 'editor') {
+    // Dodat uslov || currentUser.role === 'admin'
+    if (currentUser.role === 'editor' || currentUser.role === 'admin') {
       tasks = await Request.find().populate('applicant publication assignedTo');
     } else {
       tasks = await Request.find({ assignedTo: currentUser._id }).populate('applicant publication assignedTo');
@@ -28,12 +29,16 @@ router.get('/', async (req, res) => {
   }
 });
 
-// 2. Forma za kreiranje novog zahteva (samo za editora)
+// 2. Forma za kreiranje novog zahteva (dozvoljeno i editoru i adminu)
 router.get('/new', async (req, res) => {
   try {
     if (!req.session.user) return res.redirect('/auth/sign-in');
     const currentUser = await User.findById(req.session.user._id);
-    if (currentUser.role !== 'editor') return res.redirect('/requests');
+    
+    // Dozvoljavamo pristup i editoru i adminu
+    if (currentUser.role !== 'editor' && currentUser.role !== 'admin') {
+      return res.redirect('/requests');
+    }
 
     const publications = await Publication.find({});
     const processors = await User.find({ role: 'processor' }); 
@@ -111,16 +116,14 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-
 router.delete('/:id', async (req, res) => {
   try {
-    await Request.findByIdAndDelete(req.params.id); // Prilagodi metod u zavisnosti od baze koju koristiš
+    await Request.findByIdAndDelete(req.params.id); 
     res.redirect('/requests');
   } catch (err) {
     console.log(err);
     res.redirect('/requests');
   }
 });
-
 
 module.exports = router;

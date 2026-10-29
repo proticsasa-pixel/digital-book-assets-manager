@@ -1,50 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create New Request</title>
+  <title>Novi zahtev</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
-
+  
+  <!-- Navbar -->
   <%- include('../partials/navbar') %>
 
-  <h1>Create a New Processing Request</h1>
-  
-  <form action="/requests" method="POST">
+  <div class="container" style="max-width: 700px; margin: 40px auto; padding: 20px;">
     
-    <!-- Izbor publikacije iz baze -->
-    <label for="publication">Publication:</label>
-    <select name="publication" id="publication" required>
-      <% publications.forEach(pub => { %>
-        <option value="<%= pub._id %>"><%= pub.title %> (Grade: <%= pub.grade %>, Subject: <%= pub.subject %>)</option>
-      <% }) %>
-    </select>
-    <br><br>
+    <h1 style="margin-bottom: 24px; text-align: center;">Create a New Processing Request</h1>
 
-    <!-- Opis zahteva / zadatka -->
-    <label for="req_description">Task Description:</label>
-    <textarea name="req_description" id="req_description" rows="4" cols="50" required placeholder="Describe the multimedia assets to be prepared..."></textarea>
-    <br><br>
+    <form action="/requests" method="POST">
+      
+      <!-- 1. PUBLIKACIJE (Dinamičko povlačenje iz baze) -->
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="publication" style="display: block; margin-bottom: 6px; font-weight: 500;">Publication:</label>
+        <select id="publication" name="publication" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;" required>
+          <option value="">-- Izaberi publikaciju --</option>
+          <% publications.forEach(pub => { %>
+            <option value="<%= pub._id %>"><%= pub.title %> (Razred: <%= pub.grade %>, Predmet: <%= pub.subject %>)</option>
+          <% }) %>
+        </select>
+      </div>
 
-    <!-- Lokacija fajla (link ili putanja) -->
-    <label for="file_location">File Location (Link / Path):</label>
-    <input type="text" name="file_location" id="file_location" required placeholder="Paste link or path here...">
-    <br><br>
+      <!-- Ispravljeno na req_description da se slaže sa modelom -->
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="req_description" style="display: block; margin-bottom: 6px; font-weight: 500;">Task Description:</label>
+        <textarea id="req_description" name="req_description" rows="4" placeholder="Describe the multimedia assets to be prepared..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;" required></textarea>
+      </div>
 
-    <!-- Izbor procesora kome se zadatak dodeljuje -->
-    <label for="assignedTo">Assign To Processor:</label>
-    <select name="assignedTo" id="assignedTo" required>
-      <% processors.forEach(proc => { %>
-        <option value="<%= proc._id %>"><%= proc.username %> (<%= proc.email %>)</option>
-      <% }) %>
-    </select>
-    <br><br>
+      <!-- Ispravljeno na file_location da se slaže sa modelom -->
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label for="file_location" style="display: block; margin-bottom: 6px; font-weight: 500;">File Location (Link / Path):</label>
+        <input type="text" id="file_location" name="file_location" placeholder="Paste link or path here.." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;" required>
+      </div>
 
-    <button type="submit">Create Request</button>
-  </form>
+      <!-- 2. PROCESORI (Dinamičko povlačenje iz baze preko prosleđene promenljive 'processors') -->
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label for="assignedTo" style="display: block; margin-bottom: 6px; font-weight: 500;">Assign To Processor:</label>
+        <select id="assignedTo" name="assignedTo" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;" required>
+          <option value="">-- Izaberi procesora --</option>
+          <% processors.forEach(proc => { %>
+            <option value="<%= proc._id %>"><%= proc.username %> (<%= proc.email %>)</option>
+          <% }) %>
+        </select>
+      </div>
 
-  <br>
-  <a href="/requests">Back to Dashboard</a>
+      <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px; align-items: flex-start;">
+        <button type="submit" class="btn" style="padding: 10px 20px; cursor: pointer;">Create Request</button>
+        <a href="/requests" style="color: #475569; text-decoration: none; font-size: 14px;">&larr; Back to Dashboard</a>
+      </div>
+
+    </form>
+  </div>
+
 </body>
 </html>

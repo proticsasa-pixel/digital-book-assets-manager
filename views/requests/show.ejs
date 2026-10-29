@@ -1,65 +1,99 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Request Details</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
 
+  <!-- Navbar -->
   <%- include('../partials/navbar') %>
 
-  <p><a href="/requests">&larr; Back to Requests List</a></p>
+  <div class="details-container">
+    
+    <!-- Back link -->
+    <div class="details-back-link">
+      <a href="/requests">&larr; Back to Requests List</a>
+    </div>
 
-  <h1>Request Details</h1>
+    <h1 class="details-title">Request Details</h1>
 
-  <div>
-    <p><strong>Publication:</strong> <%= task.publication ? task.publication.title : 'Unknown' %></p>
-    <p><strong>Description:</strong> <%= task.req_description %></p>
-    <p><strong>File Location:</strong> <a href="<%= task.file_location %>" target="_blank">Open File</a></p>
-    <p><strong>Current Status:</strong> <%= task.status %></p>
-    <p><strong>Assigned Processor:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Unassigned' %></p>
+    <!-- Osnovne informacije o zahtevu -->
+    <div class="details-card">
+      <p><strong>Publication:</strong> <%= task.publication ? task.publication.title : 'Unknown' %></p>
+      <p><strong>Description:</strong> <%= task.req_description %></p>
+      <p><strong>File Location:</strong> <a href="<%= task.file_location %>" target="_blank">Open File</a></p>
+      <p><strong>Current Status:</strong> 
+        <% 
+          let statusClass = 'status-pending';
+          if (task.status === 'Completed') statusClass = 'status-completed';
+          else if (task.status === 'Needs Clarification') statusClass = 'status-clarification';
+          else if (task.status === 'In Progress') statusClass = 'status-progress';
+        %>
+        <span class="status-badge <%= statusClass %>">
+          <%= task.status %>
+        </span>
+      </p>
+      <p><strong>Assigned Processor:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Unassigned' %></p>
+
+      <!-- Dugme za brisanje - VIDLJIVO SAMO ZA EDITOR-a I ADMIN-a -->
+      <% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
+        <div style="margin-top: 20px; border-top: 1px solid #e2e8f0; paddingTop: 15px;">
+          <form action="/requests/<%= task._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovaj zahtev?');">
+            <button type="submit" style="background: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-weight: 500;">Delete Request</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Sekcija sa istorijom prepiske -->
+    <h3 class="comments-section-title">Conversation & Notes</h3>
+    
+    <% if (task.comments && task.comments.length > 0) { %>
+      <div class="comments-list">
+        <% task.comments.forEach(comment => { %>
+          <div class="comment-box">
+            <div class="comment-header">
+              <strong><%= comment.author ? comment.author.username : 'User' %></strong>
+              <span><%= comment.createdAt ? new Date(comment.createdAt).toLocaleString('sr-RS') : '' %></span>
+            </div>
+            <p class="comment-text"><%= comment.text %></p>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p class="no-comments">No notes or messages for this request yet.</p>
+    <% } %>
+
+    <!-- Forma za ažuriranje i slanje poruke -->
+    <div class="update-form-card">
+      <h3 class="update-form-title">Add Message / Update Status</h3>
+      
+      <form action="/requests/<%= task._id %>?_method=PUT" method="POST">
+        
+        <div class="form-group-details">
+          <label for="status">Status:</label>
+          <select name="status" id="status">
+            <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+            <option value="In Progress" <%= task.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+            <option value="Needs Clarification" <%= task.status === 'Needs Clarification' ? 'selected' : '' %>>Needs Clarification</option>
+            <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
+          </select>
+        </div>
+
+        <div class="form-group-details">
+          <label for="commentText">New Message / Note:</label>
+          <textarea name="commentText" id="commentText" rows="4" placeholder="Enter message or clarification..."></textarea>
+        </div>
+
+        <button type="submit" class="btn" style="padding: 10px 20px; cursor: pointer;">Send Message & Save Status</button>
+      
+      </form>
+    </div>
+
   </div>
-
-  <hr>
-
-  <h2>Conversation & Notes</h2>
-
-  <% if (task.comments && task.comments.length > 0) { %>
-    <ul>
-      <% task.comments.forEach(comment => { %>
-        <li>
-          <strong><%= comment.author ? comment.author.username : 'User' %></strong> 
-          <i>(<%= comment.createdAt ? comment.createdAt.toLocaleString() : '' %>):</i>
-          <p><%= comment.text %></p>
-        </li>
-        <hr style="border: 0.5px solid #eee;">
-      <% }) %>
-    </ul>
-  <% } else { %>
-    <p><i>No notes or messages for this request yet.</i></p>
-  <% } %>
-
-  <hr>
-
-  <h3>Add Message / Update Status</h3>
-  
-  <form action="/requests/<%= task._id %>?_method=PUT" method="POST">
-    <label for="status">Status:</label>
-    <select name="status">
-      <option value="Pending" <%= task.status === 'Pending' ? 'selected' : '' %>>Pending</option>
-      <option value="In Progress" <%= task.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
-      <option value="Needs Clarification" <%= task.status === 'Needs Clarification' ? 'selected' : '' %>>Needs Clarification</option>
-      <option value="Completed" <%= task.status === 'Completed' ? 'selected' : '' %>>Completed</option>
-    </select>
-
-    <br><br>
-    <label for="commentText">New Message / Note:</label><br>
-    <textarea name="commentText" rows="3" cols="45" placeholder="Enter message or clarification..."></textarea>
-
-    <br><br>
-    <button type="submit">Send Message & Save Status</button>
-  </form>
 
 </body>
 </html>

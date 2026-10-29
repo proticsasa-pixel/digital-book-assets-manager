@@ -11,7 +11,7 @@ function ensureAdmin(req, res, next) {
   res.redirect('/');
 }
 
-// 1. Prikazforme za Sign In
+// 1. Prikaz forme za Sign In
 router.get('/sign-in', (req, res) => {
   res.render('auth/sign-in.ejs', { errorMessage: null });
 });
@@ -19,7 +19,6 @@ router.get('/sign-in', (req, res) => {
 // 2. Obrada prijave (Sign In) - ASINHRONO + TRIMOVANJE
 router.post('/sign-in', async (req, res) => {
   try {
-    // Trimujemo i stavljamo mala slova da ne zeza tipfeler
     const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
 
     const userInDatabase = await User.findOne({ email: email });
@@ -27,7 +26,6 @@ router.post('/sign-in', async (req, res) => {
       return res.render('auth/sign-in.ejs', { errorMessage: 'Korisnik sa ovim email-om ne postoji.' });
     }
   
-    // Asinhrono poređenje lozinki (ne koči server!)
     const validPassword = await bcrypt.compare(
       req.body.password,
       userInDatabase.password
@@ -57,31 +55,37 @@ router.get('/sign-out', (req, res) => {
   });
 });
 
-
 // 4. Prikaz forme za novog korisnika (samo za admina)
 router.get('/new-user', ensureAdmin, (req, res) => {
-  res.render('auth/new-user.ejs', { errorMessage: null });
+  res.render('auth/new-user.ejs', { errorMessage: null, successMessage: null });
 });
 
-// 5. Čuvanje novog korisnika u bazi - ASINHRONO + TRIMOVANJE
+// 5. Čuvanje novog korisnika u bazi - ASINHRONO + TRIMOVANJE + PROVERA DUPLIKATA
 router.post('/new-user', ensureAdmin, async (req, res) => {
   try {
     const username = req.body.username ? req.body.username.trim() : '';
     const email = req.body.email ? req.body.email.trim().toLowerCase() : '';
 
-    const userInDatabase = await User.findOne({ username: username });
-    if (userInDatabase) {
-      return res.render('auth/new-user.ejs', { errorMessage: 'Korisničko ime je već zauzeto.' });
+    // Provera da li username već postoji
+    const existingUsername = await User.findOne({ username: username });
+    if (existingUsername) {
+      return res.render('auth/new-user.ejs', { errorMessage: 'Korisničko ime je već zauzeto.', successMessage: null });
+    }
+
+    // Provera da li email već postoji
+    const existingEmail = await User.findOne({ email: email });
+    if (existingEmail) {
+      return res.render('auth/new-user.ejs', { errorMessage: 'Korisnik sa ovim email-om već postoji u bazi.', successMessage: null });
     }
 
     if (req.body.password !== req.body.confirmPassword) {
-      return res.render('auth/new-user.ejs', { errorMessage: 'Lozinke se ne poklapaju.' });
+      return res.render('auth/new-user.ejs', { errorMessage: 'Lozinke se ne poklapaju.', successMessage: null });
     }
 
     // Asinhrono heširanje nove lozinke
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     
-    // Kreiramo objekat sa očišćenim podacima
+    // Kreiramo novog korisnika
     await User.create({
       username: username,
       email: email,
@@ -89,10 +93,15 @@ router.post('/new-user', ensureAdmin, async (req, res) => {
       role: req.body.role
     });
     
-    res.redirect('/');
+    // Vraćamo formu sa porukom o uspehu
+    return res.render('auth/new-user.ejs', { 
+      errorMessage: null, 
+      successMessage: 'Korisnik je uspešno unesen u bazu!' 
+    });
+
   } catch (error) {
     console.log(error);
-    res.render('auth/new-user.ejs', { errorMessage: 'Greška pri kreiranju korisnika.' });
+    res.render('auth/new-user.ejs', { errorMessage: 'Greška pri kreiranju korisnika.', successMessage: null });
   }
 });
 

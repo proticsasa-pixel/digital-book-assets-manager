@@ -1,47 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create New User</title>
+  <meta charset="UTF-8">
+  <title>Create a New User Account</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
-<body>
-
-
-
-  <p style="margin-top: 15px;">
-    <a href="/" style="text-decoration: none;">← Back to Home</a>
-  </p>
-
-  <h1>Create a New User Account</h1>
+<body class="auth-body">
   
-  <form action="/auth/new-user" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" name="username" id="username" required />
-    <br><br>
-
-    <label for="email">Email:</label>
-    <input type="email" name="email" id="email" required />
-    <br><br>
-
-    <label for="password">Password:</label>
-    <input type="password" name="password" id="password" required />
-    <br><br>
-
-    <label for="confirmPassword">Confirm Password:</label>
-    <input type="password" name="confirmPassword" id="confirmPassword" required />
-    <br><br>
+  <div class="auth-wrapper">
     
-    <label for="role">Role:</label>
-    <select name="role" id="role">
-      <option value="editor">Editor</option>
-      <option value="processor">Processor</option>
-      <option value="admin">Admin</option>
-    </select>
-    <br><br>
+    <!-- Link za povratak -->
+    <a href="/" class="back-link">&larr; Back to Home</a>
 
-    <button type="submit">Create User</button>
-  </form>
+    <!-- Glavna kartica forme -->
+    <div class="container">
+      
+      <!-- Zaglavlje -->
+      <div class="auth-header">
+        <h1>Create a New User Account</h1>
+        <p>Unesite podatke za registraciju novog korisnika</p>
+      </div>
+
+      <!-- Prikaz greške ako postoji -->
+      <% if (errorMessage) { %>
+        <div class="error-box">
+          <%= errorMessage %>
+        </div>
+      <% } %>
+
+      <!-- Prikaz poruke o uspehu ako postoji -->
+      <% if (successMessage) { %>
+        <div class="success-box">
+          <%= successMessage %>
+        </div>
+      <% } %>
+
+      <!-- Forma -->
+      <form action="/auth/new-user" method="POST">
+        
+        <div class="form-group">
+          <label for="username">Username:</label>
+          <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password:</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role:</label>
+          <select id="role" name="role">
+            <option value="editor">Editor</option>
+            <option value="processor">Processor</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn">Create User</button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <!-- SCRIPT ZA AUTOMATSKO SKIDANJE PORUKA NA KUCANJE -->
+  <script>
+    const formInputs = document.querySelectorAll('input, select');
+    
+    formInputs.forEach(input => {
+      input.addEventListener('focus', () => {
+        const errorBox = document.querySelector('.error-box');
+        const successBox = document.querySelector('.success-box');
+        
+        if (errorBox) errorBox.style.display = 'none';
+        if (successBox) successBox.style.display = 'none';
+      });
+    });
+  </script>
 
 </body>
 </html>

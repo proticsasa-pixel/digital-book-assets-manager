@@ -1,35 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Add New Publication</title>
+  <title>Nova publikacija</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
-
-  <h1>Add a New Publication</h1>
   
-  <form action="/publications" method="POST">
-    <label for="title">Title:</label>
-    <input type="text" name="title" id="title" required placeholder="e.g., Matematika 5">
-    <br><br>
+  <!-- Navbar -->
+  <%- include('../partials/navbar') %>
 
-    <label for="grade">Grade:</label>
-    <input type="number" name="grade" id="grade" required placeholder="e.g., 5">
-    <br><br>
+  <!-- Glavni kontejner za formu -->
+  <div class="container" style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+    
+    <!-- Link za povratak na početnu stranu -->
+    <div style="margin-bottom: 20px;">
+      <a href="/" style="display: inline-block; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500;">
+        &larr; Back to Home
+      </a>
+    </div>
 
-    <label for="subject">Subject:</label>
-    <input type="text" name="subject" id="subject" required placeholder="e.g., Mathematics">
-    <br><br>
+    <!-- Naslov strane -->
+    <div style="margin-bottom: 24px; text-align: center;">
+      <h1 style="font-size: 26px; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Create New Publication</h1>
+      <p style="color: #64748b; font-size: 14px;">Unesite podatke za novu publikaciju ili resurs</p>
+    </div>
 
-    <label for="owner">Owner / Author:</label>
-    <input type="text" name="owner" id="owner" placeholder="e.g., ZUNS">
-    <br><br>
+    <!-- Forma za kreiranje -->
+    <form action="/publications" method="POST" style="background: #ffffff; padding: 28px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 16px;">
+      
+      <!-- Polje za naziv publikacije sa placeholder-om -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="title" style="font-size: 14px; font-weight: 500; color: #1e293b;">Title</label>
+        <input type="text" id="title" name="title" placeholder="npr. Matematička zbirka za 5. razred" required style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none;">
+      </div>
 
-    <button type="submit">Save Publication</button>
-  </form>
+      <!-- Polje za razred sa placeholder-om -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="grade" style="font-size: 14px; font-weight: 500; color: #1e293b;">Grade (Razred)</label>
+        <input type="text" id="grade" name="grade" placeholder="npr. V razred (ili 5)" required style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none;">
+      </div>
 
-  <br>
-  <a href="/requests">Back to Dashboard</a>
+      <!-- Polje za predmet sa placeholder-om -->
+      <div style="display: flex; flex-direction: column; gap: 6px;">
+        <label for="subject" style="font-size: 14px; font-weight: 500; color: #1e293b;">Subject (Predmet)</label>
+        <input type="text" id="subject" name="subject" placeholder="npr. Matematika" required style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none;">
+      </div>
+
+      <!-- Dugme za snimanje -->
+      <div style="margin-top: 8px; text-align: right;">
+        <button type="submit" class="btn" style="background-color: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+          Save Publication
+        </button>
+      </div>
+
+    </form>
+  </div>
+
 </body>
 </html>

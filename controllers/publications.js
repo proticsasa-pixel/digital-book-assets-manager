@@ -33,8 +33,8 @@ const ensureEditor = async (req, res, next) => {
 // 1. Prikaz svih publikacija (dostupno i editoru i procesoru)
 router.get('/', ensureSignedIn, async (req, res) => {
   try {
-    const publications = await Publication.find({});
     const currentUser = await User.findById(req.session.user._id);
+    const publications = await Publication.find({}).populate('owner');
     
     res.render('publications/index.ejs', { publications, currentUser });
   } catch (error) {
@@ -44,13 +44,26 @@ router.get('/', ensureSignedIn, async (req, res) => {
 });
 
 // 2. Forma za kreiranje nove publikacije (SAMO za editora)
-router.get('/new', ensureEditor, (req, res) => {
-  res.render('publications/new.ejs');
+router.get('/new', async (req, res) => {
+  try {
+    if (!req.session.user) return res.redirect('/auth/sign-in');
+    
+    // Pronađi sve korisnike čija je uloga 'editor'
+    const editors = await User.find({ role: 'editor' }); 
+
+    res.render('publications/new.ejs', { editors });
+  } catch (error) {
+    console.log(error);
+    res.redirect('/requests');
+  }
 });
 
 // 3. Čuvanje nove publikacije u bazi (SAMO za editora)
 router.post('/', ensureEditor, async (req, res) => {
   try {
+    // Automatski dodajemo ID trenutno ulogovanog korisnika kao vlasnika publikacije
+    req.body.owner = req.session.user._id;
+
     await Publication.create(req.body);
     res.redirect('/publications');
   } catch (error) {

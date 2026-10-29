@@ -14,11 +14,11 @@
     
     <nav class="nav-links">
       <% if (currentUser) { %>
-        <a href="/" class="active">Home</a>
+        <a href="/">Home</a>
         <a href="/requests">Requests</a>
-        <% if (currentUser.role === 'editor') { %>
+        <!-- <% if (currentUser.role === 'editor') { %>
           <a href="/requests/new">New Request</a>
-        <% } %>
+        <% } %> -->
         <a href="/publications">Publications</a>
       <% } %>
       
@@ -28,7 +28,7 @@
 
       <% if (typeof user !== 'undefined' && user) { %>
         <span class="user-badge"><%= user.role %></span>
-        <a href="/auth/sign-out" style="color: var(--error-text);">Sign Out</a>
+        <a href="/auth/sign-out";">Sign Out</a>
       <% } else { %>
         <a href="/auth/sign-in">Sign In</a>
       <% } %>
@@ -49,27 +49,35 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
         
         <!-- Kartica 1: Zahtevi -->
-        <div class="card-box" style="text-align: left; margin: 0;">
-          <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Upravljanje zahtevima</h3>
-          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Pregledajte sve aktivne zahteve, statuse i prateću dokumentaciju.</p>
-          <a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Pregled zahteva</a>
-        </div>
+<div class="card-box" style="text-align: left; margin: 0; display: flex; flex-direction: column; height: 100%;">
+  <div style="flex-grow: 1;">
+    <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Request management</h3>
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">View all active requests, statuses, and supporting documentation.</p>
+  </div>
+  <div>
+    <a href="/requests" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Review of requests</a>
+  </div>
+</div>
 
         <!-- Kartica 2: Novi zahtev (Samo za urednike/administratore ako treba, ili ostaje) -->
-        <% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
+        <!--<% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
           <div class="card-box" style="text-align: left; margin: 0;">
             <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Novi unos</h3>
             <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Kreirajte novi zahtev za digitalne materijale ili publikacije.</p>
             <a href="/requests/new" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #0f172a;">+ Kreiraj zahtev</a>
           </div>
-        <% } %>
+        <% } %> -->
 
-        <!-- Kartica 3: Publikacije -->
-        <div class="card-box" style="text-align: left; margin: 0;">
-          <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Publikacije</h3>
-          <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">Biblioteka i pregled izdvojenih izdanja i pratećih resursa.</p>
-          <a href="/publications" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #475569;">Lista publikacija</a>
-        </div>
+     <!-- Kartica 3: Publikacije -->
+<div class="card-box" style="text-align: left; margin: 0; display: flex; flex-direction: column; height: 100%;">
+  <div style="flex-grow: 1;">
+    <h3 style="font-size: 18px; margin-bottom: 8px; color: var(--text-main);">Publications</h3>
+    <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">List and overview of separate releases and supporting resources.</p>
+  </div>
+  <div>
+    <a href="/publications" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none; background-color: #2563eb; color: white;">Publications list</a>
+  </div>
+</div>
 
       </div>
     <% } %>

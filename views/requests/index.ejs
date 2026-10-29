@@ -1,42 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Requests</title>
+  <title>Pregled zahteva</title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
-
+  
+  <!-- Navbar -->
   <%- include('../partials/navbar') %>
 
-  <h1>Dashboard - Requests & Tasks</h1>
-  
-  <p>Logged in as: <strong><%= currentUser.username %></strong> (<%= currentUser.role %>)</p>
+  <!-- Kontejner -->
+  <div class="container" style="max-width: 800px; margin: 40px auto; padding: 20px;">
+    
+    <!-- Back link -->
+    <div style="margin-bottom: 20px;">
+      <a href="/" style="display: inline-block; color: #64748b; text-decoration: none; font-size: 14px; font-weight: 500;">
+        &larr; Back to Home
+      </a>
+    </div>
 
-  <% if (currentUser.role === 'editor') { %>
-    <hr>
-    <a href="/requests/new">Create New Request</a>
-  <% } %>
+    <h1 style="text-align: center;">Dashboard - Requests & Tasks</h1>
+    <p style="text-align: center;">Logged in as: <strong><%= currentUser.username %></strong> (<%= currentUser.role %>)</p>
+    
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #e2e8f0;">
 
-  <h2>Tasks List</h2>
+    <!-- Dugme za kreiranje zahteva -->
+    <% if (currentUser.role === 'editor' || currentUser.role === 'admin') { %>
+      <div style="margin-bottom: 20px; text-align: center;">
+        <a href="/requests/new" class="btn" style="display: inline-block; width: auto; padding: 8px 16px; text-decoration: none;">Create New Request</a>
+      </div>
+    <% } %>
 
-  <% if (tasks.length === 0) { %>
-    <p>There are currently no tasks in the system.</p>
-  <% } else { %>
-    <ul>
-      <% tasks.forEach(task => { %>
-        <li>
-          <strong>Publication:</strong> <%= task.publication ? task.publication.title : 'Unknown' %> <br>
-          <strong>Description:</strong> <%= task.req_description %> <br>
-          <strong>Status:</strong> <%= task.status %> <br>
-          <strong>Assigned To:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Unassigned' %> <br>
-          
-          <p><a href="/requests/<%= task._id %>">Details / Conversation &rarr;</a></p>
-        </li>
-        <hr>
-      <% }) %>
-    </ul>
-  <% } %>
+    <h2 style="margin-top: 30px;">Tasks List</h2>
+    
+    <!-- Provera da li zadaci postoje i ispis preko petlje -->
+    <% if (tasks && tasks.length > 0) { %>
+      <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
+        <% tasks.forEach(task => { %>
+          <div style="background: #ffffff; padding: 16px; border: 1px solid #e2e8f0; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <h3 style="margin: 0 0 8px 0; font-size: 18px;">
+              <a href="/requests/<%= task._id %>" style="color: #2563eb; text-decoration: none;">
+                <%= task.publication ? task.publication.title : 'Nepoznata publikacija' %>
+              </a>
+            </h3>
+            <p style="margin: 4px 0; color: #475569; font-size: 14px;"><strong>Opis zahtjeva:</strong> <%= task.req_description %></p>
+            <p style="margin: 4px 0; color: #475569; font-size: 14px;"><strong>Status:</strong> <span style="font-weight: 600; color: #0f172a;"><%= task.status %></span></p>
+            <p style="margin: 4px 0; color: #475569; font-size: 14px;"><strong>Dodeljeno procesoru:</strong> <%= task.assignedTo ? task.assignedTo.username : 'Nije dodeljeno' %></p>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <p style="text-align: center; color: #64748b; margin-top: 15px;">There are currently no tasks in the system.</p>
+    <% } %>
+
+  </div>
 
 </body>
 </html>

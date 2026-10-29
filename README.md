@@ -61,8 +61,10 @@
 ### ***Screenshots***
 
 ##### Landing page
+<img width="1446" height="681" alt="Screenshot 2026-10-29 at 09 51 41" src="https://github.com/user-attachments/assets/1687cd2a-d1ac-4011-a43b-5c3a13e87d51" />
 
 ##### Home page
+<img width="1446" height="692" alt="Screenshot 2026-10-29 at 09 52 52" src="https://github.com/user-attachments/assets/365fbcba-65b2-407a-a3a5-e151f64172ac" />
 
 ***
 

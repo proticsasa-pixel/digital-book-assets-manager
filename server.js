@@ -12,6 +12,7 @@ const morgan = require('morgan');
 const session = require('express-session');
 
 // Uvoz Request modela radi brojanja zahteva
+const User = require('./models/user.js')
 const Request = require('./models/request.js');
 
 // 1. PRVO OSNOVNI MIDDLEWARE

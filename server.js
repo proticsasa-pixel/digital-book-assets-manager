@@ -12,7 +12,7 @@ const morgan = require('morgan');
 const session = require('express-session');
 
 // Uvoz Request modela radi brojanja zahteva
-// const Request = require('../models/request.js');
+const Request = require('../models/request.js');
 
 // 1. PRVO OSNOVNI MIDDLEWARE
 app.use(express.urlencoded({ extended: false }));
@@ -91,7 +91,7 @@ app.get('/', async (req, res) => {
   }
 });
 
-const port = process.env.PORT ? process.env.PORT : '3000';
+// const port = process.env.PORT ? process.env.PORT : '3000';
 
 // app.listen(port, () => {
 //   console.log(`The express app is ready on port ${port}!`);

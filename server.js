@@ -50,26 +50,19 @@ app.use(express.static(path.join(__dirname, "public")));
 
 
 // 3. KONTROLERI I RUTE
-const authController = require('./controllers/auth.js');
-app.use('/auth', authController);
-
-const requestsController = require('./controllers/requests.js');
-app.use('/requests', requestsController);
-
-const publicationsController = require('./controllers/publications.js');
-app.use('/publications', publicationsController);
 
 // Početna ruta sa proširenim brojanjem (Pending i Needs Clarification)
 app.get('/', async (req, res) => {
+  console.log('index is being used')
   try {
     let newRequestsCount = 0;
-
+    
     if (req.session.user) {
       const currentUser = req.session.user;
       
       // Definišemo uslov za statuse na koje treba skrenuti pažnju
       const statusCondition = { $in: ['Pending', 'Needs Clarification'] };
-
+      
       if (currentUser.role === 'editor' || currentUser.role === 'admin') {
         // Urednik/admin vidi sve zahteve sa ovim statusima
         newRequestsCount = await Request.countDocuments({ status: statusCondition });
@@ -78,19 +71,30 @@ app.get('/', async (req, res) => {
         newRequestsCount = await Request.countDocuments({ assignedTo: currentUser._id, status: statusCondition });
       }
     }
-
+    
     res.render('index.ejs', {
       user: req.session.user,
+      currentUser: req.session.user,
       newRequestsCount: newRequestsCount
     });
   } catch (error) {
     console.log(error);
     res.render('index.ejs', {
       user: req.session.user,
+      currentUser: req.session.user,
       newRequestsCount: 0
     });
   }
 });
+
+const authController = require('./controllers/auth.js');
+app.use('/auth', authController);
+
+const requestsController = require('./controllers/requests.js');
+app.use('/requests', requestsController);
+
+const publicationsController = require('./controllers/publications.js');
+app.use('/publications', publicationsController);
 
 // const port = process.env.PORT ? process.env.PORT : '3000';
 

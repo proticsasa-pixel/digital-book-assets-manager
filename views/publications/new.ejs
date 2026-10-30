@@ -47,6 +47,18 @@
         <input type="text" id="subject" name="subject" placeholder="npr. Matematika" required style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none;">
       </div>
 
+
+      <!-- polje za ownera-->
+      <div class="mb-3">
+  <label for="owner" class="form-label">Owner (Vlasnik / Urednik)</label>
+  <select name="owner" id="owner" class="form-control" required>
+    <option value="" disabled selected>Izaberi urednika...</option>
+    <% users.forEach(user => { %>
+      <option value="<%= user._id %>"><%= user.username %> (<%= user.role %>)</option>
+    <% }) %>
+  </select>
+</div>
+
       <!-- Dugme za snimanje -->
       <div style="margin-top: 8px; text-align: right;">
         <button type="submit" class="btn" style="background-color: #2563eb; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">

@@ -68,7 +68,7 @@ label {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-main);
-  margin-bottom: -8px; /* Privlači labelu bliže inputu */
+  margin-bottom: -8px;
 }
 
 input, select {
@@ -247,8 +247,6 @@ a:hover {
   min-height: 100vh;
 }
 
-
-/* Dodatne klase za savršeno poravnanje forme i naslova */
 .auth-wrapper {
   width: 100%;
   max-width: 420px;
@@ -265,7 +263,6 @@ a:hover {
   letter-spacing: -0.5px;
 }
 
-
 /* --- PORUKA O USPEHU --- */
 .success-box {
   background-color: #f0fdf4;
@@ -277,7 +274,6 @@ a:hover {
   margin-bottom: 16px;
   border: 1px solid #bbf7d0;
 }
-
 
 /* Stilovi za stranicu detalja zahteva */
 .details-container {
@@ -432,4 +428,23 @@ a:hover {
 
 .form-group-details textarea {
   resize: vertical;
+}
+
+/* ==========================================
+   ELEGANTAN ADMIN AKCENT SAMO ZA NAVBAR
+   ========================================== */
+.navbar.admin-navbar {
+  background-color: #0f172a !important; /* Elegantna tamno plava/siva */
+  border-bottom: 3px solid #3b82f6 !important; /* Diskretna plava linija koja označava admina */
+}
+
+.navbar.admin-navbar .nav-brand,
+.navbar.admin-navbar .nav-links a {
+  color: #f8fafc !important;
+}
+
+.navbar.admin-navbar .user-badge {
+  color: #93c5fd !important;
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
 }

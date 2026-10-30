@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Publication = require('../models/publication.js');
-const Request = require('../models/request.js'); // Dodato da bismo mogli da brišemo i zahteve
+const Request = require('../models/request.js'); 
 const User = require('../models/user.js');
 
 // Middleware za proveru da li je korisnik ulogovan (bilo ko)
@@ -13,14 +13,15 @@ const ensureSignedIn = (req, res, next) => {
   next();
 };
 
-// Middleware za proveru da li je korisnik editor
-const ensureEditor = async (req, res, next) => {
+// Middleware za proveru da li je korisnik editor ILI admin
+const ensureEditorOrAdmin = async (req, res, next) => {
   if (!req.session.user) {
     return res.redirect('/auth/sign-in');
   }
   try {
     const currentUser = await User.findById(req.session.user._id);
-    if (!currentUser || currentUser.role !== 'editor') {
+    // Dozvoljavamo pristup samo ako je editor ili admin (procesor ovde nema pristup)
+    if (!currentUser || (currentUser.role !== 'editor' && currentUser.role !== 'admin')) {
       return res.redirect('/requests'); 
     }
     next();
@@ -30,41 +31,51 @@ const ensureEditor = async (req, res, next) => {
   }
 };
 
-// 1. Prikaz svih publikacija (dostupno i editoru i procesoru)
+// 1. Prikaz svih publikacija (dostupno svima ulogovanima)
 router.get('/', ensureSignedIn, async (req, res) => {
   try {
     const currentUser = await User.findById(req.session.user._id);
     const publications = await Publication.find({}).populate('owner');
     
-    res.render('publications/index.ejs', { publications, currentUser });
+    // Provera da li postoji poruka o grešci pri brisanju
+    let errorMessage = null;
+    if (req.query.error === 'unauthorized') {
+      errorMessage = 'Nemate dozvolu da obrišete ovu publikaciju jer niste njen vlasnik.';
+    }
+
+    res.render('publications/index.ejs', { publications, currentUser, errorMessage });
   } catch (error) {
     console.log(error);
     res.redirect('/');
   }
 });
 
-// 2. Forma za kreiranje nove publikacije (SAMO za editora)
-router.get('/new', async (req, res) => {
+// 2. Forma za kreiranje nove publikacije
+router.get('/new', ensureEditorOrAdmin, async (req, res) => {
   try {
-    if (!req.session.user) return res.redirect('/auth/sign-in');
-    
-    // Pronađi sve korisnike čija je uloga 'editor'
-    const editors = await User.find({ role: 'editor' }); 
-
-    res.render('publications/new.ejs', { editors });
+    const users = await User.find({}); 
+    res.render('publications/new.ejs', { users: users });
   } catch (error) {
     console.log(error);
     res.redirect('/requests');
   }
 });
 
-// 3. Čuvanje nove publikacije u bazi (SAMO za editora)
-router.post('/', ensureEditor, async (req, res) => {
+// 3. Čuvanje nove publikacije u bazi (Automatski postavlja vlasnika)
+router.post('/', ensureEditorOrAdmin, async (req, res) => {
   try {
-    // Automatski dodajemo ID trenutno ulogovanog korisnika kao vlasnika publikacije
-    req.body.owner = req.session.user._id;
+    const currentUser = await User.findById(req.session.user._id);
+    
+    // Ako je ulogovan urednik, vlasnik je uvek on. Ako je admin, uzima se iz forme (ili admin ako nije izabran)
+    const ownerId = (currentUser.role === 'editor' || !req.body.owner) ? currentUser._id : req.body.owner;
 
-    await Publication.create(req.body);
+    await Publication.create({
+      title: req.body.title,
+      grade: req.body.grade,
+      subject: req.body.subject,
+      owner: ownerId
+    });
+
     res.redirect('/publications');
   } catch (error) {
     console.log(error);
@@ -72,18 +83,31 @@ router.post('/', ensureEditor, async (req, res) => {
   }
 });
 
-// 4. Brisanje publikacije I svih povezanih zahteva (SAMO za editora)
-router.delete('/:id', ensureEditor, async (req, res) => {
+// 4. Brisanje publikacije (Admin briše sve, urednik samo svoje)
+router.delete('/:id', ensureEditorOrAdmin, async (req, res) => {
   try {
     const publicationId = req.params.id;
+    const currentUser = await User.findById(req.session.user._id);
+    const publication = await Publication.findById(publicationId);
 
-    // Prvo brišemo sve zahteve koji su vezani za ovu publikaciju da ne ostanu "siročići"
-    await Request.deleteMany({ publication: publicationId });
+    if (!publication) {
+      return res.redirect('/publications');
+    }
 
-    // Zatim brišemo samu publikaciju
-    await Publication.findByIdAndDelete(publicationId);
+    // Provera dozvola za brisanje:
+    const isAdmin = currentUser.role === 'admin';
+    const isOwner = publication.owner && publication.owner.toString() === currentUser._id.toString();
 
-    res.redirect('/publications');
+    if (isAdmin || isOwner) {
+      // Prvo brišemo sve zahteve vezane za publikaciju
+      await Request.deleteMany({ publication: publicationId });
+      // Zatim brišemo samu publikaciju
+      await Publication.findByIdAndDelete(publicationId);
+      return res.redirect('/publications');
+    } else {
+      // Ako nema pravo, preusmeravamo nazad sa parametrom greške
+      return res.redirect('/publications?error=unauthorized');
+    }
   } catch (error) {
     console.log(error);
     res.redirect('/publications');

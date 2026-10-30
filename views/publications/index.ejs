@@ -20,16 +20,29 @@
       </a>
     </div>
 
+    <!-- Prikaz poruke o grešci ako nema pravo brisanja -->
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="error-box" style="margin-bottom: 20px;">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
     <!-- Centrirano zaglavlje: Naslov, podnaslov i suženo dugme na sredini -->
     <div style="text-align: center; margin-bottom: 32px;">
       <h1 style="margin: 0 0 6px 0; font-size: 28px; font-weight: 700; color: #0f172a;">Publications</h1>
       <p style="margin: 0 0 16px 0; color: #64748b; font-size: 14px;">Overview of all separate releases and supporting resources</p>
       
-      <!-- Suženo plavo dugme za novu publikaciju (opciono, ako želiš da i ovo vide samo urednici, stavi i ovde uslov, mada obično samo urednici prave publikacije) -->
-      <% if (currentUser && (currentUser.role === 'editor' || currentUser.role === 'admin')) { %>
-        <a href="/publications/new" class="btn" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; width: auto;">
-          New Publication
-        </a>
+      <!-- Dugme za novu publikaciju (sa !important za admina da sigurno promeni boju) -->
+      <% if (currentUser) { %>
+        <% if (currentUser.role === 'admin') { %>
+          <a href="/publications/new" class="btn" style="background-color: #2563eb !important; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; width: auto;">
+            New Publication
+          </a>
+        <% } else if (currentUser.role === 'editor') { %>
+          <a href="/publications/new" class="btn" style="background-color: #2563eb; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 500; display: inline-block; width: auto;">
+            New Publication
+          </a>
+        <% } %>
       <% } %>
     </div>
 
@@ -48,15 +61,21 @@
               </p>
             </div>
 
-            <!-- Dugme za brisanje - VIDLJIVO SAMO ZA EDITOR-a I ADMIN-a -->
-            <% if (currentUser && (currentUser.role === 'editor' || currentUser.role === 'admin')) { %>
-              <div>
-                <form action="/publications/<%= pub._id %>?_method=DELETE" method="POST" style="margin: 0;" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovu publikaciju?');">
-                  <button type="submit" class="btn" style="background-color: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
-                    Delete
-                  </button>
-                </form>
-              </div>
+            <!-- Dugme za brisanje - Vidljivo samo za Admina ILI ako je Urednik vlasnik ove publikacije -->
+            <% if (currentUser) { %>
+              <% 
+                const isAdmin = currentUser.role === 'admin';
+                const isOwner = pub.owner && (pub.owner._id ? pub.owner._id.toString() === currentUser._id.toString() : pub.owner.toString() === currentUser._id.toString());
+              %>
+              <% if (isAdmin || isOwner) { %>
+                <div>
+                  <form action="/publications/<%= pub._id %>?_method=DELETE" method="POST" style="margin: 0;" onsubmit="return confirm('Da li ste sigurni da želite da obrišete ovu publikaciju?');">
+                    <button type="submit" class="btn" style="background-color: #ef4444; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">
+                      Delete
+                    </button>
+                  </form>
+                </div>
+              <% } %>
             <% } %>
 
           </div>

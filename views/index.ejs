@@ -8,8 +8,8 @@
 </head>
 <body style="display: block; min-height: 100vh; background-color: var(--bg-color);">
 
-  <!-- Gornja navigacija -->
-  <header class="navbar">
+  <!-- Gornja navigacija sa uslovnom klasom za admina -->
+  <header class="navbar <%= currentUser && currentUser.role === 'admin' ? 'admin-navbar' : '' %>">
     <a href="/" class="nav-brand">ZUNS Digital Assets</a>
     
     <nav class="nav-links">
@@ -32,8 +32,8 @@
     </nav>
   </header>
 
-  <!-- Glavni sadržaj -->
-  <main class="page-content" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
+  <!-- Glavni sadržaj sa uslovnom klasom admin-home -->
+  <main class="page-content <%= currentUser && currentUser.role === 'admin' ? 'admin-home' : '' %>" style="max-width: 1000px; margin: 40px auto; padding: 0 20px;">
     
     <!-- Naslov aplikacije sa finom plavom linijom -->
     <div style="margin-bottom: 30px;">

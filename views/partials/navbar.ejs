@@ -1,4 +1,4 @@
-<nav class="navbar">
+<nav class="navbar <%= currentUser && currentUser.role === 'admin' ? 'admin-navbar' : '' %>">
   <a href="/" class="nav-brand">ZUNS Digital Assets</a>
   
   <div class="nav-links">
@@ -14,7 +14,6 @@
 
       <% if (currentUser.role === 'editor') { %>
         <a href="/requests">Requests</a>
-        <!-- <a href="/requests/new">New Request</a> -->
         <a href="/publications">Publications</a>
         <span class="user-badge">(editor: <%= currentUser.username %>)</span>
       <% } %>

@@ -1,5 +1,5 @@
-// const dns = require("node:dns/promises");
-// dns.setServers(["1.1.1.1", "8.8.8.8"]);
+const dns = require("node:dns/promises");
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,14 +11,16 @@ const methodOverride = require('method-override');
 const morgan = require('morgan');
 const session = require('express-session');
 
-// Uvoz Request modela radi brojanja zahteva
-const User = require('./models/user.js')
+// Uvoz modela
+const User = require('./models/user.js');
 const Request = require('./models/request.js');
 
-// 1. PRVO OSNOVNI MIDDLEWARE
+// 1. OSNOVNI MIDDLEWARE
 app.use(express.urlencoded({ extended: false }));
 app.use(methodOverride('_method'));
 // app.use(morgan('dev'));
+
+// ⚠️ SESIJA MORA BITI PRE BILO KOG MIDDLEWARE-A KOJI ČITA req.session
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -27,7 +29,7 @@ app.use(
   })
 );
 
-// Promenljiva user postaje dostupna u svakom navbaru
+// SADA JE SESIJA AKTIVNA - ovde bezbedno delimo promenljive kroz res.locals
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.currentUser = req.session.user || null;
@@ -48,26 +50,22 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
-
 // 3. KONTROLERI I RUTE
 
 // Početna ruta sa proširenim brojanjem (Pending i Needs Clarification)
 app.get('/', async (req, res) => {
-  console.log('index is being used')
+  console.log('index is being used');
   try {
     let newRequestsCount = 0;
     
     if (req.session.user) {
       const currentUser = req.session.user;
       
-      // Definišemo uslov za statuse na koje treba skrenuti pažnju
       const statusCondition = { $in: ['Pending', 'Needs Clarification'] };
       
       if (currentUser.role === 'editor' || currentUser.role === 'admin') {
-        // Urednik/admin vidi sve zahteve sa ovim statusima
         newRequestsCount = await Request.countDocuments({ status: statusCondition });
       } else {
-        // Procesor vidi samo svoje zahteve sa ovim statusima
         newRequestsCount = await Request.countDocuments({ assignedTo: currentUser._id, status: statusCondition });
       }
     }
@@ -96,9 +94,25 @@ app.use('/requests', requestsController);
 const publicationsController = require('./controllers/publications.js');
 app.use('/publications', publicationsController);
 
-// const port = process.env.PORT ? process.env.PORT : '3000';
+// 4. PODEŠAVANJE PORTA I SERVERA (Lokalno vs Vercel)
+const port = process.env.PORT || 3000;
 
-// app.listen(port, () => {
-//   console.log(`The express app is ready on port ${port}!`);
-// });
+// Pokreće se lokalno, dok na Vercelu Express aplikacija služi preko modula
+if (process.env.NODE_ENV !== 'production') {
+  const server = app.listen(port, () => {
+    console.log(`The express app is ready on port ${port}!`);
+  });
+
+  server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n⚠️  GREŠKA: Port ${port} je već zauzet!`);
+      console.error(`➡️  Ugasi stari proces u terminalu ili promeni port.\n`);
+    } else {
+      console.error('Neočekivana serverska greška:', err);
+    }
+    process.exit(1);
+  });
+}
+
+// Obavezno za Vercel deployment!
 module.exports = app;
